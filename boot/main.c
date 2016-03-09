@@ -7,7 +7,6 @@
  * C代码将游戏文件整个加载到物理内存0x100000的位置，然后跳转到游戏的入口执行。至于为什么是0x100000，请参考游戏代码连接过程。 */
 
 #include "boot.h"
-
 #define SECTSIZE 512
 
 void readseg(unsigned char *, int, int);
@@ -15,24 +14,24 @@ void readseg(unsigned char *, int, int);
 void
 bootmain(void) {
 	struct ELFHeader *elf;
-	struct ProgramHeader *ph, *eph;
-	unsigned char* pa, *i;
+	struct ProgramHeader *ph;
+	//unsigned char* pa;
 
 	/* 因为引导扇区只有512字节，我们设置了堆栈从0x8000向下生长。
 	 * 我们需要一块连续的空间来容纳ELF文件头，因此选定了0x8000。 */
 	elf = (struct ELFHeader*)0x8000;
 
 	/* 读入ELF文件头 */
-	readseg(elf,4096,0);
+	readseg((void *)elf,52,0);
 	/* 把每个program segement依次读入内存 */
-	ph=(struct ProgramHeader)((void*)elf+elf->phoff);
-	for (k=1; k<=elf->phnum; k++)
+	ph=(struct ProgramHeader*)((void*)elf+elf->phoff);
+	for (int k=1; k<=elf->phnum; k++)
 	{
-		readseg(ph->paddr,ph->filesz,ph->p_off);
+		readseg((void *)ph->paddr,ph->filesz,ph->off);
 		ph++;
 	}
 	/*跳转到程序中*/
-	((void (*)(void))(elf-entry))();
+	((void (*)(void))(elf->entry))();
 	asm volatile("hlt");
 
 }

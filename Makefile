@@ -18,7 +18,7 @@ CFLAGS += -fno-builtin #禁止内置函数
 CFLAGS += -ggdb3 #GDB调试信息
 
 QEMU_OPTIONS := -serial stdio #以标准输入输为串口(COM1)
-QEMU_OPTIONS += -d int #输出中断信息
+#QEMU_OPTIONS += -d int #输出中断信息
 QEMU_OPTIONS += -monitor telnet:127.0.0.1:1111,server,nowait #telnet monitor
 
 QEMU_DEBUG_OPTIONS := -S #启动不执行
@@ -59,7 +59,7 @@ $(BOOT): $(BOOT_O)
 	$(LD) -e start -Ttext=0x7C00 -m elf_i386 -nostdlib -o $@.out $^
 	$(OBJCOPY) --strip-all --only-section=.text --output-target=binary $@.out $@
 	@rm $@.out
-	boot/genboot.pl $@
+	ruby mbr.rb $@
 
 $(OBJ_BOOT_DIR)/%.o: $(BOOT_DIR)/%.S
 	@mkdir -p $(OBJ_BOOT_DIR)
