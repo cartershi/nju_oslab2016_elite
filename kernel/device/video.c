@@ -54,7 +54,7 @@ display_buffer(void) {
  */
 void
 blue_screen(){
-	memset((void *)vmem,1,SCR_SIZE);
+	memset((void *)vmem,2,SCR_SIZE);
 }
 
 

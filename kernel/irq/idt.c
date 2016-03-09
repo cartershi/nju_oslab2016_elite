@@ -50,6 +50,7 @@ void vec12();
 void vec13();
 
 void irq_empty();
+void save_idt();
 
 void init_idt() {
 	int i;
@@ -82,7 +83,16 @@ void init_idt() {
 	 * 然后将hlt()删除
 	 * 
 	 * */
-	hlt();
-	//save_idt(idt, sizeof(idt));
+	//hlt();
+	save_idt(idt, sizeof(idt));
 }
 
+
+
+void save_idt(void *addr, uint32_t size) {
+		static volatile uint16_t data[3];
+		data[0] = size - 1;
+		data[1] = (uint32_t)addr;
+		data[2] = ((uint32_t)addr) >> 16;
+		asm volatile("lidt (%0)" : : "r"(data));
+}
