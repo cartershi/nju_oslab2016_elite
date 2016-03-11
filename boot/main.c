@@ -27,7 +27,7 @@ bootmain(void) {
 	ph=(struct ProgramHeader*)((void*)elf+elf->phoff);
 	for (int k=1; k<=elf->phnum; k++)
 	{
-		readseg((void *)ph->paddr,ph->filesz,ph->off);
+		readseg((void *)ph->paddr,ph->memsz,ph->off);
 		ph++;
 	}
 	/*跳转到程序中*/

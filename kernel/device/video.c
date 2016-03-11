@@ -57,5 +57,11 @@ blue_screen(){
 	memset((void *)vmem,2,SCR_SIZE);
 }
 
+void draw_line(int x,int y,uint8_t color,int len)
+{
+	assert(x>=0&&y>=0&&x<200&&y<320);
+	memset((void *)vmem+(x<<8)+(x<<6)+y,color,len);
+}
+
 
 	

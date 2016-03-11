@@ -1,34 +1,59 @@
 #include "./include/string.h"
 #include "./include/x86.h"
 #include "./include/video.h"
+#include "./include/keyboard.h"
+#include "./include/timer.h"
 
+int loc,locx;
 
+void draw_screen();
+
+void key_event(int code)
+{
+	disable_interrupt();
+	if (code==0x4b)
+	{
+		if (loc>0) loc--;
+		locx=locx+10;
+		draw_screen();
+	}
+	else 
+	if (code==0x4d)
+	{
+		if (loc<315) loc++;
+		locx=locx+10;
+		draw_screen();
+	}
+	enable_interrupt();
+}
+
+extern void init_intr();
+extern void init_idt();
+extern void init_serial();
 
 int main(){
-	printk("Printk test begin...\n");
-printk("the answer should be:\n");
-printk("#######################################################\n");
-printk("Hello, welcome to OSlab! I'm the body of the game. ");
-printk("Bootblock loads me to the memory position of 0x100000, and Makefile also tells me that I'm at the location of 0x100000. ");
-printk("~!@#$^&*()_+`1234567890-=...... ");
-printk("Now I will test your printk: ");
-printk("1 + 1 = 2, 123 * 456 = 56088\n0, -1, -2147483648, -1412505855, -32768, 102030\n0, ffffffff, 80000000, abcdef01, ffff8000, 18e8e\n");
-printk("#######################################################\n");
-printk("your answer:\n");
-printk("=======================================================\n");
-printk("%s %s%scome %co%s", "Hello,", "", "wel", 't', " ");
-printk("%c%c%c%c%c! ", 'O', 'S', 'l', 'a', 'b');
-printk("I'm the %s of %s. %s 0x%x, %s 0x%x. ", "body", "the game", "Bootblock loads me to the memory position of",
-    0x100000, "and Makefile also tells me that I'm at the location of", 0x100000);
-printk("~!@#$^&*()_+`1234567890-=...... ");
-printk("Now I will test your printk: ");
-printk("%d + %d = %d, %d * %d = %d\n", 1, 1, 1 + 1, 123, 456, 123 * 456);
-printk("%d, %d, %d, %d, %d, %d\n", 0, 0xffffffff, 0x80000000, 0xabcedf01, -32768, 102030);
-printk("%x, %x, %x, %x, %x, %x\n", 0, 0xffffffff, 0x80000000, 0xabcedf01, -32768, 102030);
-printk("=======================================================\n");
-printk("Test end!!! Good luck!!!\n");
-	printk("hehe");
-	blue_screen();
-	hlt();
+	//hlt();
+	loc=0;
+	locx=0;
+	init_serial();
+	init_idt();
+	init_intr();
+	set_timer_intr_handler(init_timer);
+	set_keyboard_intr_handler(key_event);
+	printk("first\n");
+	enable_interrupt();
+	printk("second\n");
+	while (1);
+	printk("third\n");
 	return 0;
+}
+
+void draw_screen()
+{
+	prepare_buffer();
+	int i;
+	for (i=0;i<10; i++)
+		draw_line(i+locx,0,3,10);
+	draw_line(198,loc,2,5);
+	display_buffer();
 }

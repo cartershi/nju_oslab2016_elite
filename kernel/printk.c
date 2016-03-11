@@ -10,32 +10,14 @@
  */
 #define PORT 0x3f8
 
-static void init_serial() {
-	   outb(PORT + 1, 0x00);
-	   outb(PORT + 3, 0x80);
-	   outb(PORT + 0, 0x03);
-	   outb(PORT + 1, 0x00);
-	   outb(PORT + 3, 0x03);
-	   outb(PORT + 2, 0xC7);
-	   outb(PORT + 4, 0x0B);
-}
+extern void serial_printc(char);
 
-static int is_serial_idle() {
-	   return inb(PORT + 5) & 0x20;
-}
-
-void putchar(char ch)
-{
-	init_serial();
-	while (!is_serial_idle());
-	outb(PORT,ch);
-}
 static void putch(int ch, int *cnt){
 	/*	;
 	*
 	 * Call the output function(such as putchar(ch)) to display character 'ch'.
 	 */
-	putchar(ch);
+	serial_printc(ch);
 //	*cnt++;
 
 }

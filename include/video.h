@@ -20,6 +20,7 @@ draw_pixel(int x, int y, int color) {
 void prepare_buffer();
 void display_buffer();
 void blue_screen();
+void draw_line(int,int,uint8_t,int);
 
 void draw_string(const char*, int, int, int);
 #endif

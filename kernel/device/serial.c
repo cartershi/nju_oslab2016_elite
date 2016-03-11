@@ -23,5 +23,6 @@ serial_printc(char ch) {
 	/*
 	 * implement this function
 	 */
-	;
+	while (!serial_idle());
+	outb(SERIAL_PORT,ch);
 }
