@@ -31,14 +31,14 @@ irq_handle(struct TrapFrame *tf) {
 
 	if (tf->irq == 1000) {
 		//printk("timer\n");
-		//do_timer();
+		do_timer();
 	} else if (tf->irq == 1001) {
 		uint32_t code = inb(0x60);
 		uint32_t val = inb(0x61);
 		outb(0x61, val | 0x80);
 		outb(0x61, val);
 
-		printk("%s, %d: key code = %x\n", __FUNCTION__, __LINE__, code);
+		//printk("%s, %d: key code = %x\n", __FUNCTION__, __LINE__, code);
 		do_keyboard(code);
 	} else {
 		assert(0);

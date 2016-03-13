@@ -1,0 +1,17 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+draw_screen	game.c	/^void draw_screen()$/;"	f
+draw_screen	game.c	/^void draw_screen();$/;"	p	file:
+init_idt	game.c	/^extern void init_idt();$/;"	p	file:
+init_intr	game.c	/^extern void init_intr();$/;"	p	file:
+init_serial	game.c	/^extern void init_serial();$/;"	p	file:
+key_event	game.c	/^void key_event(int code)$/;"	f	signature:(int code)
+loc	game.c	/^int loc,locx,tick=0;$/;"	v
+locx	game.c	/^int loc,locx,tick=0;$/;"	v
+main	game.c	/^int main(){$/;"	f
+tick	game.c	/^int loc,locx,tick=0;$/;"	v
+timer_event	game.c	/^void timer_event(){$/;"	f

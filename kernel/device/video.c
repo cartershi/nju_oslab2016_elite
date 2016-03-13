@@ -7,7 +7,7 @@
  * 更新屏幕的速度可能非常缓慢从而引起游戏跳帧。定义宏SLOW以只重绘屏幕变化
  * 的部分；
  * */
-#define SLOW
+//#define SLOW
 
 #ifdef SLOW
 	#define PARTIAL_UPDATE
