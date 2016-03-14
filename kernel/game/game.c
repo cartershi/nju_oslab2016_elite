@@ -13,13 +13,13 @@ typedef struct Node_he{
 }Node;
 
 static Node t[1000];
-static int loc=0,seed=2,tick=0,start_loc=0,end_loc=0;
+static int loc=100,seed=2,tick=0,start_loc=0,end_loc=0;
 
 void key_event(int code)
 {
-	if (code==0x4b&&loc>1) loc=loc-2;
+	if (code==0x4b&&loc>1) {loc=loc-2;draw_screen();}
 	else 
-	if (code==0x4d&&loc<314) loc=loc+2;
+	if (code==0x4d&&loc<314) {loc=loc+2;draw_screen();}
 }
 
 void timer_event(){
@@ -35,12 +35,6 @@ int main(){
 	init();
 	while (1)
 	{
-		disable_interrupt();
-		if (now==tick)
-		{
-			enable_interrupt();
-			continue;
-		}
 		target=tick;
 		enable_interrupt();
 		while (now<target)
