@@ -19,6 +19,7 @@ draw_pixel(int x, int y, int color) {
 
 void prepare_buffer();
 void display_buffer();
+void sys_display(uint32_t*);
 void blue_screen();
 void draw_line(int,int,uint8_t,int);
 

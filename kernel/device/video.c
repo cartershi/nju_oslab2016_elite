@@ -42,13 +42,18 @@ display_buffer(void) {
 		}
 	}
 #else
-	vmem = VMEM_ADDR;
+    vmem = VMEM_ADDR;
 	asm volatile ("cld; rep movsl" : : "c"(SCR_SIZE / 4), "S"(vbuf), "D"(vmem));
 #endif
 }
 
+void sys_display(uint32_t* vouter)
+{
+	vmem = VMEM_ADDR;
+	asm volatile ("cld; rep movsl" : : "c"(SCR_SIZE / 4), "S"(vouter), "D"(vmem));
+}
 
-/*
+	/*
  * 蓝屏
  * 
  */

@@ -6,5 +6,7 @@ void set_keyboard_intr_handler(void (*)(int));
  * 设置键盘中断的处理函数
  *
  */
+void key_event(int);
+int sys_key_query();
 
 #endif

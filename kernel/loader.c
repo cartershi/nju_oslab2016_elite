@@ -6,13 +6,15 @@
 	 +-----------+------------------`        '-----------------+
  * C代码将游戏文件整个加载到物理内存0x100000的位置，然后跳转到游戏的入口执行。至于为什么是0x100000，请参考游戏代码连接过程。 */
 
-#include "boot.h"
+#include "boot/boot.h"
+#include "include/loader.h"
+#include "include/stdio.h"
 #define SECTSIZE 512
 
 void readseg(unsigned char *, int, int);
 
 void
-bootmain(void) {
+gameloader(void) {
 	struct ELFHeader *elf;
 	struct ProgramHeader *ph;
 	unsigned char* pa,*i;
@@ -22,13 +24,13 @@ bootmain(void) {
 	elf = (struct ELFHeader*)0x800000;
 
 	/* 读入ELF文件头 */
-	readseg((void *)elf,52,0);
+	readseg((void *)elf,52,0x19000);
 	/* 把每个program segement依次读入内存 */
 	ph=(struct ProgramHeader*)((void*)elf+elf->phoff);
 	for (int k=1; k<=elf->phnum; k++)
 	{
 		pa=(unsigned char*)ph->paddr;
-		readseg((void *)ph->paddr,ph->filesz,ph->off);
+		readseg((void *)ph->paddr,ph->filesz,0x19000+ph->off);
 		for (i=pa+ph->filesz; i<pa+ph->memsz; *i++=0)
 		ph++;
 	}

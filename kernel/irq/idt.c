@@ -36,6 +36,7 @@ set_trap(struct GateDescriptor *ptr, uint32_t selector, uint32_t offset, uint32_
 
 void irq0();
 void irq1();
+void irq14();
 void vec0();
 void vec1();
 void vec2();
@@ -50,6 +51,8 @@ void vec10();
 void vec11();
 void vec12();
 void vec13();
+
+void vecsys();
 
 void irq_empty();
 void save_idt();
@@ -79,8 +82,11 @@ void init_idt() {
 
 	/* 设置外部中断的处理 */
 
+	set_intr(idt + 0x80, SEG_KERNEL_CODE, (uint32_t)vecsys, DPL_USER);
+
 	set_intr(idt + 32, SEG_KERNEL_CODE, (uint32_t)irq0, DPL_KERNEL);
 	set_intr(idt + 33, SEG_KERNEL_CODE, (uint32_t)irq1, DPL_KERNEL);
+	set_intr(idt + 32+14, SEG_KERNEL_CODE, (uint32_t)irq14, DPL_KERNEL);
 	/* 写入IDT,请自行根据i386手册完成save_idt函数,
 	 * x86.h提供了相关内联汇编的支持
 	 * 然后将hlt()删除
