@@ -90,7 +90,7 @@ $(OBJ_KERNEL_DIR)/%.o: $(KERNEL_DIR)/%.[cS]
 	$(CC) $(CFLAGS) $< -o $@
 
 $(GAME): $(GAME_O) $(LIB_O)
-	$(LD) -e main -Ttext=0xc2000000 -m elf_i386 -nostdlib -o $@ $^ $(shell $(CC) $(CFLAGS) -print-libgcc-file-name)
+	$(LD) -e main -m elf_i386 -nostdlib -o $@ $^ $(shell $(CC) $(CFLAGS) -print-libgcc-file-name)
 
 
 $(OBJ_GAME_DIR)/%.o: $(GAME_DIR)/%.c

@@ -1,46 +1,77 @@
-/* start.S的主要功能是切换在实模式工作的处理器到32位保护模式。为此需要设置正确的
- * GDT、段寄存器和CR0寄存器。C语言代码的主要工作是将磁盘上的内容装载到内存中去。
- * 磁盘镜像的结构如下：
-	 +-----------+------------------.        .-----------------+
-	 |   引导块   |  游戏二进制代码       ...        (ELF格式)     |
-	 +-----------+------------------`        '-----------------+
- * C代码将游戏文件整个加载到物理内存0x100000的位置，然后跳转到游戏的入口执行。 */
-
 #include "boot/boot.h"
 #include "include/loader.h"
 #include "include/stdio.h"
-
+#include "include/string.h"
+#include "include/x86.h"
+#include "include/mmu.h"
+#include "include/pmap.h"
+#include "include/memlayout.h"
 #define SECTSIZE 512
-#define va2pa(addr) ((unsigned int)(addr) - 0xc0000000)
 
 void readseg(unsigned char *, int, int);
 
-void
-gameloader(void) {
+void gameloader(void)
+{
 	struct ELFHeader *elf;
-	struct ProgramHeader *ph, *eph;
-	unsigned char* va, *i;
-	//printk("game loading\n");
-	/* 因为引导扇区只有512字节，我们设置了堆栈从0x8000向下生长。
-	 * 我们需要一块连续的空间来容纳ELF文件头，因此选定了0x8000。 */
-	elf = (struct ELFHeader*)0xc0800000;
+	struct ProgramHeader *ph = NULL;
+	unsigned char buf[4096];
+	unsigned char page_buffer[4096];
+	readseg(buf, 4096, 0x400800);
+	elf = (void*)buf;
+	unsigned int phoff=elf->phoff;
+	unsigned int phentsize=elf->phentsize;
+	unsigned int phnum=elf->phnum;
+	struct PageInfo *pp;
+	pde_t *pgdir=(void*) (0xc7000000);
+	/* Load each program segment */
+	int i=0;
 
-	/* 读入ELF文件头 */
-	readseg((unsigned char*)elf, 4096, 0x400800);
-	//printk("magic %x\n",elf->magic);
-	/* 把每个program segement依次读入内存 */
-	ph = (struct ProgramHeader*)((char *)elf + elf->phoff);
-	eph = ph + elf->phnum;
-	for(; ph < eph; ph ++) {
-		va = (unsigned char*)ph->vaddr; /* 获取物理地址 */
-		readseg(va, ph->filesz, ph->off+0x400800); /* 读入数据 */
-		for (i = va + ph->filesz; i < va + ph->memsz; *i ++ = 0);
+	for(i=0;i<phnum;i++ ) {
+		ph=(void *)((unsigned int)buf + phoff+i*phentsize);
+		/* Scan the program header table, load each segment into memory */
+		{
+			unsigned int va = ph->vaddr;
+			// the num of bytes already loaded
+			unsigned int data_loaded = 0;
+
+			while(va < (ph->vaddr + ph->memsz))
+			{
+				// allocate a new page
+				unsigned int offset = va & 0xfff;
+				// forced alignment on 4K boundary
+				va &=0xfffff000;
+				pp=page_alloc(0);
+				unsigned int *addr=(unsigned int*)page2kva(pp);
+				page_insert(pgdir,pp,(void*)va,PTE_U|PTE_W);
+				// zero the page buffer
+				memset(page_buffer, 0, 4096);
+
+				// the number of bytes to load this time
+				unsigned int load_byte_num = 4096 - offset;
+				if((ph->filesz - data_loaded) < load_byte_num)
+					load_byte_num = ph->filesz - data_loaded;
+
+				readseg((void *)(page_buffer + offset),load_byte_num,
+						0x400800+ph->off + data_loaded);
+				memcpy(addr, page_buffer, 4096);
+
+				va += 4096;
+				data_loaded += load_byte_num;
+			}
+
+		}
 	}
-	//printk("success");
-	//printk("entry %x\n",elf->entry);
-	__asm__("movl $0xc5000000,%%esp":::"%esp");
-	((void(*)(void))elf->entry)();
+	boot_map_region(pgdir,0xc5000000,10*1024*1024,0x5000000,PTE_U);
+	printk("stack end\n");
+	*(pgdir+0x300)=*((pte_t *)(rcr3()+KERNBASE)+0x300);
+	*(pgdir)=*((pte_t *)(rcr3()+KERNBASE));
+	__asm("movl $0xc5200000, %%esp":::"%esp");
+	lcr3((unsigned int)(pgdir)-KERNBASE);
+	volatile uint32_t entry = elf->entry;
+	printk("loader end\n");
+	((void(*)(void))(entry))();
 }
+
 
 void
 waitdisk(void) {

@@ -191,14 +191,13 @@ page_insert(pde_t *pgdir, struct PageInfo *pp, void *va, int perm)
 {
 	// Fill this function in
 	pte_t *already=pgdir_walk(pgdir,va,true);
-	printk("page_insert %x\n",already);
 	if (already==NULL) return 1;
-	if (pa2page(PTE_ADDR(PADDR((void*)*already)))!=pp)
+	if ((((*already)&PTE_P)==1)&&pa2page(PTE_ADDR(*already))!=pp)
 	{
 		page_remove(pgdir,va);
 		pp->pp_ref=pp->pp_ref+1;
 	}
-	printk("pt_entry %x\n",already);
+	//printk("pt_entry %x\n",already);
 	*already=page2pa(pp)|perm|PTE_P;
 	//tlb_invali(va);
 	return 0;
@@ -246,9 +245,9 @@ page_remove(pde_t *pgdir, void *va)
 {
 	// Fill this function in
 	pte_t *repte;
-	printk("page_removing\n");
+	//printk("page_removing\n");
 	struct PageInfo *pp=page_lookup(pgdir,va,&repte);
-	printk("page_removed\n");
+	//printk("page_removed\n");
 	if (pp==NULL) return;
 	page_decref(pp);
 	*repte=0;

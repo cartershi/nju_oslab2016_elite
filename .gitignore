@@ -30,5 +30,8 @@ obj
 *.x86_64
 *.hex
 
+*.txt
+*.swp
+
 # Debug files
 *.dSYM/
