@@ -4,40 +4,42 @@
 	 +-----------+------------------.        .-----------------+
 	 |   引导块   |  游戏二进制代码       ...        (ELF格式)     |
 	 +-----------+------------------`        '-----------------+
- * C代码将游戏文件整个加载到物理内存0x100000的位置，然后跳转到游戏的入口执行。至于为什么是0x100000，请参考游戏代码连接过程。 */
+ * C代码将游戏文件整个加载到物理内存0x100000的位置，然后跳转到游戏的入口执行。 */
 
 #include "boot/boot.h"
 #include "include/loader.h"
 #include "include/stdio.h"
+
 #define SECTSIZE 512
+#define va2pa(addr) ((unsigned int)(addr) - 0xc0000000)
 
 void readseg(unsigned char *, int, int);
 
 void
 gameloader(void) {
 	struct ELFHeader *elf;
-	struct ProgramHeader *ph;
-	unsigned char* pa,*i;
-
+	struct ProgramHeader *ph, *eph;
+	unsigned char* va, *i;
+	//printk("game loading\n");
 	/* 因为引导扇区只有512字节，我们设置了堆栈从0x8000向下生长。
 	 * 我们需要一块连续的空间来容纳ELF文件头，因此选定了0x8000。 */
-	elf = (struct ELFHeader*)0x800000;
+	elf = (struct ELFHeader*)0xc0800000;
 
 	/* 读入ELF文件头 */
-	readseg((void *)elf,52,0x19000);
+	readseg((unsigned char*)elf, 4096, 0x400800);
+	//printk("magic %x\n",elf->magic);
 	/* 把每个program segement依次读入内存 */
-	ph=(struct ProgramHeader*)((void*)elf+elf->phoff);
-	for (int k=1; k<=elf->phnum; k++)
-	{
-		pa=(unsigned char*)ph->paddr;
-		readseg((void *)ph->paddr,ph->filesz,0x19000+ph->off);
-		for (i=pa+ph->filesz; i<pa+ph->memsz; *i++=0)
-		ph++;
+	ph = (struct ProgramHeader*)((char *)elf + elf->phoff);
+	eph = ph + elf->phnum;
+	for(; ph < eph; ph ++) {
+		va = (unsigned char*)ph->vaddr; /* 获取物理地址 */
+		readseg(va, ph->filesz, ph->off+0x400800); /* 读入数据 */
+		for (i = va + ph->filesz; i < va + ph->memsz; *i ++ = 0);
 	}
-	/*跳转到程序中*/
-	((void (*)(void))(elf->entry))();
-	asm volatile("hlt");
-
+	//printk("success");
+	//printk("entry %x\n",elf->entry);
+	__asm__("movl $0xc5000000,%%esp":::"%esp");
+	((void(*)(void))elf->entry)();
 }
 
 void

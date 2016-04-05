@@ -1,7 +1,8 @@
-#include"memlayout.h"
-#include"x86.h"
-#include"pmap.h"
-#include"string.h"
+#include"include/memlayout.h"
+#include"include/string.h"
+#include"include/x86.h"
+#include"include/pmap.h"
+#include"include/stdio.h"
 
 #define npages (1<<15)			// Amount of physical memory (in pages)
 
@@ -25,16 +26,15 @@ page_init(void)
 	// 
 	// NB: DO NOT actually touch the physical memory corresponding to
 	// free pages!
-	uint32_t pgstart=PGNUM(IOPHYSMEM);
 	unsigned long i;
-	uint32_t pgend=PGNUM(ROUNDUP(EXTPHYSMEM+PGSIZE+npages*sizeof(struct PageInfo),PGSIZE));
-	for (i = 1; i < npages; i++)
-	if (i<pgstart||i>=pgend){
+	uint32_t pgend=PGNUM(0x300000);
+	for (i = npages; i >0; i--)
+	if (i>=pgend){
 		pages[i].pp_ref = 0;
 		pages[i].pp_link = page_free_list;
 		page_free_list = &pages[i];
 	}
-
+	
 }
 
 //
@@ -55,9 +55,10 @@ page_alloc(int alloc_flags)
 	// Fill this function in
 	struct PageInfo * allocted=page_free_list;
 	if (allocted==NULL) return NULL;
-	allocted->pp_link=NULL;
 	page_free_list=page_free_list->pp_link;
+	allocted->pp_link=NULL;
 	if (alloc_flags & ALLOC_ZERO) memset(page2kva(allocted),'\0',4096);
+	//printk("vir %x\n",page2kva(allocted));
 	return allocted;
 }
 
@@ -119,13 +120,13 @@ pgdir_walk(pde_t *pgdir, const void *va, int create)
 	if (((*repgdir)&PTE_P)==0)
 	{
 		if (create==false) return NULL;
-		struct PageInfo *new_pt=page_alloc(1);
+		struct PageInfo *new_pt=page_alloc(0);
 		if (new_pt==NULL) return NULL;
 		new_pt->pp_ref=new_pt->pp_ref+1;
 		*repgdir=page2pa(new_pt)|PTE_P|PTE_W;
 		reptedir=page2kva(new_pt);
 	}
-	else reptedir=page2kva(pa2page(PTE_ADDR(*repgdir)));
+	else reptedir=KADDR(PTE_ADDR(*repgdir));
 	return reptedir+PTX(va);
 	return NULL;
 }
@@ -141,20 +142,24 @@ pgdir_walk(pde_t *pgdir, const void *va, int create)
 // mapped pages.
 //
 // Hint: the TA solution uses pgdir_walk
-static void
+
+void
 boot_map_region(pde_t *pgdir, uintptr_t va, unsigned long size, physaddr_t pa, int perm)
 {
 	// Fill this function in
 	pte_t *tmppte;
+	//pte_t just=PDX(va);
 	while (size>0)
 	{
+		//if (PDX(va)!=just) {printk("va %x\n",va); just=PDX(va);}
 		tmppte=pgdir_walk(pgdir,(void *)va,true);
-		*tmppte=pa|perm|PTE_P;
+		*tmppte=pa|perm|PTE_P|PTE_W;
 		va=va+PGSIZE;
 		pa=pa+PGSIZE;
 		size=size-PGSIZE;
 	}
 }
+
 
 //
 // Map the physical page 'pp' at virtual address 'va'.
@@ -186,10 +191,14 @@ page_insert(pde_t *pgdir, struct PageInfo *pp, void *va, int perm)
 {
 	// Fill this function in
 	pte_t *already=pgdir_walk(pgdir,va,true);
+	printk("page_insert %x\n",already);
 	if (already==NULL) return 1;
-	//if (pa2page(PTE_ADDR(*already))!=pp)
-	page_remove(pgdir,va);
-	pp->pp_ref=pp->pp_ref+1;
+	if (pa2page(PTE_ADDR(PADDR((void*)*already)))!=pp)
+	{
+		page_remove(pgdir,va);
+		pp->pp_ref=pp->pp_ref+1;
+	}
+	printk("pt_entry %x\n",already);
 	*already=page2pa(pp)|perm|PTE_P;
 	//tlb_invali(va);
 	return 0;
@@ -237,7 +246,9 @@ page_remove(pde_t *pgdir, void *va)
 {
 	// Fill this function in
 	pte_t *repte;
+	printk("page_removing\n");
 	struct PageInfo *pp=page_lookup(pgdir,va,&repte);
+	printk("page_removed\n");
 	if (pp==NULL) return;
 	page_decref(pp);
 	*repte=0;

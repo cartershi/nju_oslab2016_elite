@@ -27,7 +27,9 @@ int main(){
 		target=query_timer();
 		while (now<target)
 		{
-			if(now%5==0) draw_screen();//redraw=true;
+			if(now%5==0) {
+				draw_screen();//redraw=true;
+			}
 			//if(now==0) 
 			move_node();
 			int moved=query_key();

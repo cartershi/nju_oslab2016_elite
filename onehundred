@@ -2,19 +2,19 @@
 
 open(SIG, $ARGV[0]) || die "open $ARGV[0]: $!";
 
-$n = sysread(SIG, $buf, 100*1024);
+$n = sysread(SIG, $buf, 4*1024*1024);
 
-if($n > 100 * 1024){
+if($n > 4* 1024 * 1024){
 	print STDERR "ERROR:Kernel binary file too large:\
-    $n bytes (max 102400)\n";
+    $n bytes (max 4* 1024 * 1024)\n";
 	exit 1;
 }
 
-		  print STDERR "Kernel binary file is $n bytes (max 102400)\n";
+		  print STDERR "Kernel binary file is $n bytes (max 10*1024*1024)\n";
 
 		  $m = $n % (512);
 		  $s = 512 - $m;
-		  $p = 102400 - $n;
+		  $p = 4*1024*1024 - $n;
 
 		  print STDERR "Kernel binary file size n = $n\n";
 		  print STDERR "Kernel binary file sectors num m = $m\n";
@@ -30,14 +30,14 @@ if($n > 100 * 1024){
 
 		  open(SIG, $ARGV[0]) || die "open $ARGV[0]: $!";
 
-		  $n = sysread(SIG, $buf, 100*1024);
+		  $n = sysread(SIG, $buf, 4*1024*1024);
 
-		  if($n > 100 * 1024){
-		    print STDERR "ERROR:Kernel binary file large: $n bytes (max 102400)\n";
+		  if($n > 4*1024*1024){
+		    print STDERR "ERROR:Kernel binary file large: $n bytes (max 4*1024*1024)\n";
 			  exit 1;
 			  }
 
-			  print STDERR "Kernel binary file is $n bytes (max 102400)\n";
+			  print STDERR "Kernel binary file is $n bytes (max 4*1024*1024)\n";
 			  print STDERR "*********************************************\n";
 			  print STDERR "*********************************************\n";
 			  print STDERR "*********************************************\n";
