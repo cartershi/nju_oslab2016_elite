@@ -3,12 +3,15 @@
 #include "include/stdio.h"
 #include "include/string.h"
 #include "include/x86.h"
-#include "include/mmu.h"
 #include "include/pmap.h"
+#include "include/mmu.h"
+#include "include/kvm.h"
 #include "include/memlayout.h"
 #define SECTSIZE 512
 
 void readseg(unsigned char *, int, int);
+
+void intogame(uint32_t);
 
 void gameloader(void)
 {
@@ -62,16 +65,46 @@ void gameloader(void)
 		}
 	}
 	boot_map_region(pgdir,0xc5000000,10*1024*1024,0x5000000,PTE_U);
-	printk("stack end\n");
 	*(pgdir+0x300)=*((pte_t *)(rcr3()+KERNBASE)+0x300);
 	*(pgdir)=*((pte_t *)(rcr3()+KERNBASE));
-	__asm("movl $0xc5200000, %%esp":::"%esp");
 	lcr3((unsigned int)(pgdir)-KERNBASE);
 	volatile uint32_t entry = elf->entry;
-	printk("loader end\n");
-	((void(*)(void))(entry))();
+	intogame(entry);
 }
+struct PCB 
+{
+	void *tf;
+	uint8_t kstack[4096];
+};
 
+void intogame(uint32_t entry){
+	struct TrapFrame ss;
+	struct TrapFrame *tf=&ss;
+	tf->edi=0;
+	tf->esi=0;
+	tf->ebp=0;
+	tf->xxx=0;
+	tf->ebx=0;
+	tf->edx=0;
+	tf->ecx=0;
+	tf->eax=0;
+	tf->eflags=0x202;
+	tf->irq=0x80;
+	tf->eip=entry;
+	tf->cs=(SELECTOR_USER(SEG_USER_CODE));
+	change_tss(0xc5100000);
+	tf->esp=0xc5200000;
+	tf->ss=(SELECTOR_USER(SEG_USER_DATA));
+	tf->ds=tf->es=(SELECTOR_USER(SEG_USER_DATA));
+	__asm__("movl %0,%%esp"::"r"(tf));
+	__asm__("popa");
+	__asm__("popl %es");
+	__asm__("popl %ds");
+	//__asm__("popl %0,");
+	__asm__("addl $8, %%esp"::);
+	__asm__("iret");
+	
+}
 
 void
 waitdisk(void) {

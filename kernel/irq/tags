@@ -1,0 +1,46 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+INTERRUPT_GATE_32	idt.c	3;"	d	file:
+IO_PIC1	i8259.c	3;"	d	file:
+IO_PIC2	i8259.c	4;"	d	file:
+IRQ_OFFSET	i8259.c	5;"	d	file:
+IRQ_SLAVE	i8259.c	6;"	d	file:
+TRAP_GATE_32	idt.c	4;"	d	file:
+asm_do_irq	do_irq.S	/^asm_do_irq:$/;"	l
+do_keyboard	irq_handle.c	/^static void (*do_keyboard)(int);$/;"	v	file:
+do_syscall	irq_handle.c	/^void do_syscall(struct TrapFrame *tf);$/;"	p	file:	signature:(struct TrapFrame *tf)
+do_syscall	irq_handle.c	/^void do_syscall(struct TrapFrame *tf){$/;"	f	signature:(struct TrapFrame *tf)
+do_timer	irq_handle.c	/^static void (*do_timer)(void);$/;"	v	file:
+idt	idt.c	/^struct GateDescriptor idt[NR_IRQ];$/;"	v	typeref:struct:GateDescriptor
+init_idt	idt.c	/^void init_idt() {$/;"	f
+init_intr	i8259.c	/^init_intr(void) {$/;"	f	signature:(void)
+irq0	idt.c	/^void irq0();$/;"	p	file:
+irq1	idt.c	/^void irq1();$/;"	p	file:
+irq14	idt.c	/^void irq14();$/;"	p	file:
+irq_empty	idt.c	/^void irq_empty();$/;"	p	file:
+irq_handle	irq_handle.c	/^irq_handle(struct TrapFrame *tf) {$/;"	f	signature:(struct TrapFrame *tf)
+save_idt	idt.c	/^void save_idt();$/;"	p	file:
+save_idt	idt.c	/^void save_idt(void *addr, uint32_t size) {$/;"	f	signature:(void *addr, uint32_t size)
+set_intr	idt.c	/^set_intr(struct GateDescriptor *ptr, uint32_t selector, uint32_t offset, uint32_t dpl) {$/;"	f	file:	signature:(struct GateDescriptor *ptr, uint32_t selector, uint32_t offset, uint32_t dpl)
+set_keyboard_intr_handler	irq_handle.c	/^set_keyboard_intr_handler( void (*ptr)(int) ) {$/;"	f	signature:( void (*ptr)(int) )
+set_timer_intr_handler	irq_handle.c	/^set_timer_intr_handler( void (*ptr)(void) ) {$/;"	f	signature:( void (*ptr)(void) )
+set_trap	idt.c	/^set_trap(struct GateDescriptor *ptr, uint32_t selector, uint32_t offset, uint32_t dpl) {$/;"	f	file:	signature:(struct GateDescriptor *ptr, uint32_t selector, uint32_t offset, uint32_t dpl)
+vec0	idt.c	/^void vec0();$/;"	p	file:
+vec1	idt.c	/^void vec1();$/;"	p	file:
+vec10	idt.c	/^void vec10();$/;"	p	file:
+vec11	idt.c	/^void vec11();$/;"	p	file:
+vec12	idt.c	/^void vec12();$/;"	p	file:
+vec13	idt.c	/^void vec13();$/;"	p	file:
+vec2	idt.c	/^void vec2();$/;"	p	file:
+vec3	idt.c	/^void vec3();$/;"	p	file:
+vec4	idt.c	/^void vec4();$/;"	p	file:
+vec5	idt.c	/^void vec5();$/;"	p	file:
+vec6	idt.c	/^void vec6();$/;"	p	file:
+vec7	idt.c	/^void vec7();$/;"	p	file:
+vec8	idt.c	/^void vec8();$/;"	p	file:
+vec9	idt.c	/^void vec9();$/;"	p	file:
+vecsys	idt.c	/^void vecsys();$/;"	p	file:

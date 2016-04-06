@@ -123,7 +123,7 @@ pgdir_walk(pde_t *pgdir, const void *va, int create)
 		struct PageInfo *new_pt=page_alloc(0);
 		if (new_pt==NULL) return NULL;
 		new_pt->pp_ref=new_pt->pp_ref+1;
-		*repgdir=page2pa(new_pt)|PTE_P|PTE_W;
+		*repgdir=page2pa(new_pt)|PTE_P|PTE_W|PTE_U;
 		reptedir=page2kva(new_pt);
 	}
 	else reptedir=KADDR(PTE_ADDR(*repgdir));
@@ -153,7 +153,7 @@ boot_map_region(pde_t *pgdir, uintptr_t va, unsigned long size, physaddr_t pa, i
 	{
 		//if (PDX(va)!=just) {printk("va %x\n",va); just=PDX(va);}
 		tmppte=pgdir_walk(pgdir,(void *)va,true);
-		*tmppte=pa|perm|PTE_P|PTE_W;
+		*tmppte=pa|perm|PTE_P|PTE_W|PTE_U;
 		va=va+PGSIZE;
 		pa=pa+PGSIZE;
 		size=size-PGSIZE;

@@ -134,10 +134,28 @@
 #define DPL_KERNEL              0
 #define DPL_USER                3
 
-#define NR_SEGMENTS             3
+//type for desc
+#define SEG_WRITABLE			0X2
+#define SEG_READABLE			0X2
+#define SEG_EXECUTABLE			0X8
+#define SEG_RW_DATA				0x2 //WRITEBLE
+#define SEG_EXE_CODE			0xa	//READABLE|EXECUTABLE
+
+
+#define NR_SEGMENTS             512
 #define SEG_KERNEL_CODE         1 
 #define SEG_KERNEL_DATA         2
+#define SEG_USER_CODE           3
+#define SEG_USER_DATA           4
+#define SEG_TSS					5
 
+
+//construct the selector for kernel or user
+#define SELECTOR_KERNEL(s)		( ((s) << 3) | DPL_KERNEL )
+#define SELECTOR_USER(s)		( ((s) << 3) | DPL_USER )
+
+#define SELECTOR_INDEX(s)		(((s) >> 3) - 4)
+//for user
 
 #ifdef __ASSEMBLER__
 
@@ -262,6 +280,13 @@ struct Taskstate {
 
 // Gate descriptors for interrupts and traps
 
+typedef struct {
+	uint32_t link;         // old ts selector
+	uint32_t esp0;         // Ring 0 Stack pointer and segment selector
+	uint32_t ss0;          // after an increase in privilege level
+	char dontcare[88];
+}TSS;
+
 
 struct GateDescriptor {
 	uint32_t offset_15_0      : 16;//low 16bit of offset in segment
@@ -278,7 +303,12 @@ struct GateDescriptor {
 
 struct TrapFrame {
 	uint32_t edi, esi, ebp, xxx, ebx, edx, ecx, eax;
+	uint32_t es, ds;
 	int32_t irq;
+	uint32_t error_code;
+	uint32_t eip,cs,eflags;
+	uint32_t esp;
+	uint32_t ss;
 };
 
 
