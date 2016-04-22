@@ -40,6 +40,7 @@ asm_do_irq:
 	pushl %eax
 	movw $(SELECTOR_KERNEL(SEG_KERNEL_DATA)), %ax
 	movw %ax, %es
+	movw %ax, %ds
 	popl %eax
 	pushal
 

@@ -1,17 +1,15 @@
 #include "boot/boot.h"
 #include "include/loader.h"
-#include "include/stdio.h"
-#include "include/string.h"
-#include "include/x86.h"
 #include "include/pmap.h"
-#include "include/mmu.h"
 #include "include/kvm.h"
+#include "include/common.h"
+#include "include/pcb.h"
 #include "include/memlayout.h"
 #define SECTSIZE 512
 
 void readseg(unsigned char *, int, int);
 
-void intogame(uint32_t);
+void intogame(pde_t*,uint32_t);
 
 void gameloader(void)
 {
@@ -25,7 +23,7 @@ void gameloader(void)
 	unsigned int phentsize=elf->phentsize;
 	unsigned int phnum=elf->phnum;
 	struct PageInfo *pp;
-	pde_t *pgdir=(void*) (0xc7000000);
+	pde_t *pgdir=page2kva(page_alloc(0));
 	/* Load each program segment */
 	int i=0;
 
@@ -65,20 +63,17 @@ void gameloader(void)
 		}
 	}
 	boot_map_region(pgdir,0xc5000000,10*1024*1024,0x5000000,PTE_U);
+	uint32_t stackss=0xc0000000-PGSIZE;
+	page_insert(pgdir,page_alloc(0),(void *)stackss,PTE_U|PTE_W);
 	*(pgdir+0x300)=*((pte_t *)(rcr3()+KERNBASE)+0x300);
 	*(pgdir)=*((pte_t *)(rcr3()+KERNBASE));
 	lcr3((unsigned int)(pgdir)-KERNBASE);
 	volatile uint32_t entry = elf->entry;
-	intogame(entry);
+	intogame(pgdir,entry);
 }
-struct PCB 
-{
-	void *tf;
-	uint8_t kstack[4096];
-};
 
-void intogame(uint32_t entry){
-	struct TrapFrame ss;
+void intogame(pde_t* pgdir,uint32_t entry){
+	/*struct TrapFrame ss;
 	struct TrapFrame *tf=&ss;
 	tf->edi=0;
 	tf->esi=0;
@@ -93,9 +88,10 @@ void intogame(uint32_t entry){
 	tf->eip=entry;
 	tf->cs=(SELECTOR_USER(SEG_USER_CODE));
 	change_tss(0xc5100000);
-	tf->esp=0xc5200000;
+	tf->esp=0xbfffffff;
 	tf->ss=(SELECTOR_USER(SEG_USER_DATA));
-	tf->ds=tf->es=(SELECTOR_USER(SEG_USER_DATA));
+	tf->ds=tf->es=(SELECTOR_USER(SEG_USER_DATA));*/
+	uint32_t tf=process_prepare(pgdir,entry);
 	__asm__("movl %0,%%esp"::"r"(tf));
 	__asm__("popa");
 	__asm__("popl %es");

@@ -10,7 +10,7 @@ if($n > 4* 1024 * 1024){
 	exit 1;
 }
 
-		  print STDERR "Kernel binary file is $n bytes (max 10*1024*1024)\n";
+		  print STDERR "Kernel binary file is $n bytes (max 4*1024*1024)\n";
 
 		  $m = $n % (512);
 		  $s = 512 - $m;

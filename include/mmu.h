@@ -229,6 +229,14 @@ struct Segdesc {
 #define STS_TG32	0xF	    // 32-bit Trap Gate
 
 
+
+//PCB status
+#define NR_PCB	0x100
+#define PRO_RUNNING  0x1
+#define PRO_TOBERUN  0x2
+#define PRO_SLEEPING 0x3
+#define PRO_UNEXEC   0x4
+
 /*
  *
  *	Part 3.  Traps.

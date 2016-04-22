@@ -5,6 +5,8 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 CHECKSUM	entry.S	/^#define CHECKSUM (-(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS))$/;"	d
+DPL_KERNEL	irq/do_irq.S	/^#define DPL_KERNEL 0$/;"	d
+FA_PID	pcb.c	/^	uint32_t FA_PID;$/;"	m	struct:PCB	file:	access:public
 FREQ_8253	device/timer.c	7;"	d	file:
 HZ	device/timer.c	8;"	d	file:
 INTERRUPT_GATE_32	irq/idt.c	3;"	d	file:
@@ -15,9 +17,25 @@ IRQ_SLAVE	irq/i8259.c	6;"	d	file:
 MULTIBOOT_HEADER_FLAGS	entry.S	/^#define MULTIBOOT_HEADER_FLAGS (0)$/;"	d
 MULTIBOOT_HEADER_MAGIC	entry.S	/^#define MULTIBOOT_HEADER_MAGIC (0x1BADB002)$/;"	d
 PARTIAL_UPDATE	device/video.c	13;"	d	file:
+PCB	loader.c	/^struct PCB $/;"	s	file:
+PCB	pcb.c	/^struct PCB$/;"	s	file:
+PCB::FA_PID	pcb.c	/^	uint32_t FA_PID;$/;"	m	struct:PCB	file:	access:public
+PCB::PID	pcb.c	/^	uint32_t PID;$/;"	m	struct:PCB	file:	access:public
+PCB::kstack	loader.c	/^	uint8_t kstack[4096];$/;"	m	struct:PCB	file:	access:public
+PCB::kstack	pcb.c	/^	uint8_t kstack[4096];$/;"	m	struct:PCB	file:	access:public
+PCB::link	pcb.c	/^	struct PCB *link;$/;"	m	struct:PCB	typeref:struct:PCB::PCB	file:	access:public
+PCB::pgdir	pcb.c	/^	pde_t pgdir;$/;"	m	struct:PCB	file:	access:public
+PCB::state	pcb.c	/^	uint8_t state;$/;"	m	struct:PCB	file:	access:public
+PCB::tf	loader.c	/^	void *tf;$/;"	m	struct:PCB	file:	access:public
+PCB::time_slice	pcb.c	/^	uint32_t time_slice;$/;"	m	struct:PCB	file:	access:public
+PID	pcb.c	/^	uint32_t PID;$/;"	m	struct:PCB	file:	access:public
+PID_cnt	pcb.c	/^static uint32_t PID_cnt;$/;"	v	file:
 PORT	printk.c	11;"	d	file:
 RELOC	entry.S	/^#define	RELOC(x) ((x) - KERNBASE)$/;"	d
-SECTSIZE	loader.c	10;"	d	file:
+SECTSIZE	loader.c	7;"	d	file:
+SEG_KERNEL_CODE	irq/do_irq.S	/^#define SEG_KERNEL_CODE 1$/;"	d
+SEG_KERNEL_DATA	irq/do_irq.S	/^#define SEG_KERNEL_DATA 2$/;"	d
+SELECTOR_KERNEL	irq/do_irq.S	/^#define SELECTOR_KERNEL(s)	( ((s) << 3) | DPL_KERNEL )$/;"	d
 SERIAL_PORT	device/serial.c	3;"	d	file:
 SRL	entry.S	/^#define SRL(val, shamt)		(((val) >> (shamt)) & ~(-1 << (32 - (shamt))))$/;"	d
 TIMER_PORT	device/timer.c	6;"	d	file:
@@ -25,6 +43,7 @@ TRAP_GATE_32	irq/idt.c	4;"	d	file:
 _panic	assert.c	/^_panic(const char *file, int line, const char *fmt,...)$/;"	f	signature:(const char *file, int line, const char *fmt,...)
 _start	entry.S	/^_start = RELOC(entry)$/;"	d
 _warn	assert.c	/^_warn(const char *file, int line, const char *fmt,...)$/;"	f	signature:(const char *file, int line, const char *fmt,...)
+alloc_pcb	pcb.c	/^void alloc_pcb()$/;"	f
 asm_do_irq	irq/do_irq.S	/^asm_do_irq:$/;"	l
 blue_screen	device/video.c	/^blue_screen(){$/;"	f
 boot_map_region	pmap.c	/^boot_map_region(pde_t *pgdir, uintptr_t va, unsigned long size, physaddr_t pa, int perm)$/;"	f	signature:(pde_t *pgdir, uintptr_t va, unsigned long size, physaddr_t pa, int perm)
@@ -34,7 +53,6 @@ change_tss	kvm.c	/^void change_tss(unsigned int loc)$/;"	f	signature:(unsigned i
 cnt	device/timer.c	/^static int cnt=0;$/;"	v	file:
 display_buffer	device/video.c	/^display_buffer(void) {$/;"	f	signature:(void)
 do_keyboard	irq/irq_handle.c	/^static void (*do_keyboard)(int);$/;"	v	file:
-do_syscall	irq/irq_handle.c	/^void do_syscall(struct TrapFrame *tf);$/;"	p	file:	signature:(struct TrapFrame *tf)
 do_syscall	irq/irq_handle.c	/^void do_syscall(struct TrapFrame *tf){$/;"	f	signature:(struct TrapFrame *tf)
 do_timer	irq/irq_handle.c	/^static void (*do_timer)(void);$/;"	v	file:
 draw_line	device/video.c	/^void draw_line(int x,int y,uint8_t color,int len)$/;"	f	signature:(int x,int y,uint8_t color,int len)
@@ -46,21 +64,18 @@ gameloader	loader.c	/^void gameloader(void)$/;"	f	signature:(void)
 gdt	kvm.c	/^static struct Segdesc gdt[NR_SEGMENTS];$/;"	v	typeref:struct:Segdesc	file:
 idt	irq/idt.c	/^struct GateDescriptor idt[NR_IRQ];$/;"	v	typeref:struct:GateDescriptor
 init_idt	irq/idt.c	/^void init_idt() {$/;"	f
-init_idt	main.c	/^extern void init_idt();$/;"	p	file:
 init_intr	irq/i8259.c	/^init_intr(void) {$/;"	f	signature:(void)
-init_intr	main.c	/^extern void init_intr();$/;"	p	file:
 init_segment	kvm.c	/^init_segment(void) {$/;"	f	signature:(void)
 init_serial	device/serial.c	/^init_serial(void) {$/;"	f	signature:(void)
-init_serial	main.c	/^extern void init_serial();$/;"	p	file:
 init_timer	device/timer.c	/^init_timer(void) {$/;"	f	signature:(void)
-irq0	irq/idt.c	/^void irq0();$/;"	p	file:
-irq1	irq/idt.c	/^void irq1();$/;"	p	file:
-irq14	irq/idt.c	/^void irq14();$/;"	p	file:
-irq_empty	irq/idt.c	/^void irq_empty();$/;"	p	file:
+intogame	loader.c	/^void intogame(uint32_t entry){$/;"	f	signature:(uint32_t entry)
 irq_handle	irq/irq_handle.c	/^irq_handle(struct TrapFrame *tf) {$/;"	f	signature:(struct TrapFrame *tf)
 key_event	device/keyborad.c	/^void key_event(int code)$/;"	f	signature:(int code)
+kstack	loader.c	/^	uint8_t kstack[4096];$/;"	m	struct:PCB	file:	access:public
+kstack	pcb.c	/^	uint8_t kstack[4096];$/;"	m	struct:PCB	file:	access:public
+link	pcb.c	/^	struct PCB *link;$/;"	m	struct:PCB	typeref:struct:PCB::PCB	file:	access:public
 main	main.c	/^int main()$/;"	f
-npages	pmap.c	7;"	d	file:
+npages	pmap.c	5;"	d	file:
 page_alloc	pmap.c	/^page_alloc(int alloc_flags)$/;"	f	signature:(int alloc_flags)
 page_decref	pmap.c	/^page_decref(struct PageInfo* pp)$/;"	f	signature:(struct PageInfo* pp)
 page_free	pmap.c	/^page_free(struct PageInfo *pp)$/;"	f	signature:(struct PageInfo *pp)
@@ -71,20 +86,24 @@ page_lookup	pmap.c	/^page_lookup(pde_t *pgdir, void *va, pte_t **pte_store)$/;"	
 page_remove	pmap.c	/^page_remove(pde_t *pgdir, void *va)$/;"	f	signature:(pde_t *pgdir, void *va)
 pages	pmap.c	/^struct PageInfo pages[npages];		\/\/ Physical page state array$/;"	v	typeref:struct:PageInfo
 panicstr	assert.c	/^const char *panicstr;$/;"	v
+pcb_free_list	pcb.c	/^static struct PCB *pcb_free_list;$/;"	v	typeref:struct:PCB	file:
+pcb_running_list	pcb.c	/^static struct PCB *pcb_running_list;$/;"	v	typeref:struct:PCB	file:
+pcb_sleeping_list	pcb.c	/^static struct PCB *pcb_sleeping_list;$/;"	v	typeref:struct:PCB	file:
+pcb_toberun_list	pcb.c	/^static struct PCB *pcb_toberun_list;$/;"	v	typeref:struct:PCB	file:
+pcb_unexec_list	pcb.c	/^static struct PCB *pcb_unexec_list;$/;"	v	typeref:struct:PCB	file:
+pgdir	pcb.c	/^	pde_t pgdir;$/;"	m	struct:PCB	file:	access:public
 pgdir_walk	pmap.c	/^pgdir_walk(pde_t *pgdir, const void *va, int create)$/;"	f	signature:(pde_t *pgdir, const void *va, int create)
 prepare_buffer	device/video.c	/^prepare_buffer(void) {$/;"	f	signature:(void)
 printk	printk.c	/^int	printk(const char *fmt, ...){$/;"	f	signature:(const char *fmt, ...)
+process	pcb.c	/^static struct PCB process[NR_PCB];$/;"	v	typeref:struct:PCB	file:
 putch	printk.c	/^static void putch(int ch, int *cnt){$/;"	f	file:	signature:(int ch, int *cnt)
 readsect	loader.c	/^readsect(void *dst, int offset) {$/;"	f	signature:(void *dst, int offset)
 readseg	loader.c	/^readseg(unsigned char *pa, int count, int offset) {$/;"	f	signature:(unsigned char *pa, int count, int offset)
-readseg	loader.c	/^void readseg(unsigned char *, int, int);$/;"	p	file:	signature:(unsigned char *, int, int)
 relocated	entry.S	/^relocated:$/;"	l
 right_move	device/keyborad.c	/^static int right_move=0;$/;"	v	file:
-save_idt	irq/idt.c	/^void save_idt();$/;"	p	file:
 save_idt	irq/idt.c	/^void save_idt(void *addr, uint32_t size) {$/;"	f	signature:(void *addr, uint32_t size)
 serial_idle	device/serial.c	/^serial_idle(void) {$/;"	f	file:	signature:(void)
 serial_printc	device/serial.c	/^serial_printc(char ch) {$/;"	f	signature:(char ch)
-serial_printc	printk.c	/^extern void serial_printc(char);$/;"	p	file:	signature:(char)
 set_intr	irq/idt.c	/^set_intr(struct GateDescriptor *ptr, uint32_t selector, uint32_t offset, uint32_t dpl) {$/;"	f	file:	signature:(struct GateDescriptor *ptr, uint32_t selector, uint32_t offset, uint32_t dpl)
 set_keyboard_intr_handler	irq/irq_handle.c	/^set_keyboard_intr_handler( void (*ptr)(int) ) {$/;"	f	signature:( void (*ptr)(int) )
 set_segment	kvm.c	/^set_segment(struct Segdesc *ptr, uint32_t pl, uint32_t type) {$/;"	f	file:	signature:(struct Segdesc *ptr, uint32_t pl, uint32_t type)
@@ -92,28 +111,16 @@ set_timer_intr_handler	irq/irq_handle.c	/^set_timer_intr_handler( void (*ptr)(vo
 set_trap	irq/idt.c	/^set_trap(struct GateDescriptor *ptr, uint32_t selector, uint32_t offset, uint32_t dpl) {$/;"	f	file:	signature:(struct GateDescriptor *ptr, uint32_t selector, uint32_t offset, uint32_t dpl)
 set_tss	kvm.c	/^set_tss(struct Segdesc *ptr) {$/;"	f	file:	signature:(struct Segdesc *ptr)
 spin	entry.S	/^spin:	jmp	spin$/;"	l
+state	pcb.c	/^	uint8_t state;$/;"	m	struct:PCB	file:	access:public
 sys_display	device/video.c	/^void sys_display(uint32_t* vouter)$/;"	f	signature:(uint32_t* vouter)
 sys_key_query	device/keyborad.c	/^int sys_key_query()$/;"	f
 sys_timer_query	device/timer.c	/^int sys_timer_query()$/;"	f
+tf	loader.c	/^	void *tf;$/;"	m	struct:PCB	file:	access:public
+time_slice	pcb.c	/^	uint32_t time_slice;$/;"	m	struct:PCB	file:	access:public
 timer_event	device/timer.c	/^void timer_event(){$/;"	f
 tlb_invalidate	pmap.c	/^tlb_invalidate(pde_t *pgdir, void *va)$/;"	f	signature:(pde_t *pgdir, void *va)
 tss	kvm.c	/^static TSS tss; $/;"	v	file:
 vbuf	device/video.c	/^static uint8_t vbuf[SCR_SIZE];$/;"	v	file:
-vec0	irq/idt.c	/^void vec0();$/;"	p	file:
-vec1	irq/idt.c	/^void vec1();$/;"	p	file:
-vec10	irq/idt.c	/^void vec10();$/;"	p	file:
-vec11	irq/idt.c	/^void vec11();$/;"	p	file:
-vec12	irq/idt.c	/^void vec12();$/;"	p	file:
-vec13	irq/idt.c	/^void vec13();$/;"	p	file:
-vec2	irq/idt.c	/^void vec2();$/;"	p	file:
-vec3	irq/idt.c	/^void vec3();$/;"	p	file:
-vec4	irq/idt.c	/^void vec4();$/;"	p	file:
-vec5	irq/idt.c	/^void vec5();$/;"	p	file:
-vec6	irq/idt.c	/^void vec6();$/;"	p	file:
-vec7	irq/idt.c	/^void vec7();$/;"	p	file:
-vec8	irq/idt.c	/^void vec8();$/;"	p	file:
-vec9	irq/idt.c	/^void vec9();$/;"	p	file:
-vecsys	irq/idt.c	/^void vecsys();$/;"	p	file:
 vmem	device/video.c	/^uint8_t *vmem = VMEM_ADDR;$/;"	v
 vprintk	printk.c	/^int	vprintk(const char *fmt,va_list ap){ $/;"	f	signature:(const char *fmt,va_list ap)
 vref	device/video.c	/^static uint8_t vref[SCR_SIZE];$/;"	v	file:

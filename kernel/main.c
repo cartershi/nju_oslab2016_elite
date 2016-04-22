@@ -1,8 +1,8 @@
-#include "include/stdio.h"
 #include "include/keyboard.h"
 #include "include/loader.h"
+#include "include/pcb.h"
 #include "include/timer.h"
-#include "include/x86.h"
+#include "include/common.h"
 #include "include/pmap.h"
 #include "include/kvm.h"
 extern void init_intr();
@@ -28,6 +28,7 @@ int main()
 		num+=128*1024*1024;
 	}
 	enable_interrupt();
+	init_pcb();
 	gameloader();
 	while (1);
 }
