@@ -233,16 +233,14 @@ OBJ_KERNEL_DIR	Makefile	/^OBJ_KERNEL_DIR := $(OBJ_DIR)\/$(KERNEL_DIR)$/;"	m
 OBJ_LIB_DIR	Makefile	/^OBJ_LIB_DIR    := $(OBJ_DIR)\/$(LIB_DIR)$/;"	m
 PADDR	include/pmap.h	22;"	d
 PARTIAL_UPDATE	kernel/device/video.c	13;"	d	file:
-PCB	kernel/loader.c	/^struct PCB $/;"	s	file:
 PCB	kernel/pcb.c	/^struct PCB$/;"	s	file:
 PCB::FA_PID	kernel/pcb.c	/^	uint32_t FA_PID;$/;"	m	struct:PCB	file:	access:public
 PCB::PID	kernel/pcb.c	/^	uint32_t PID;$/;"	m	struct:PCB	file:	access:public
-PCB::kstack	kernel/loader.c	/^	uint8_t kstack[4096];$/;"	m	struct:PCB	file:	access:public
 PCB::kstack	kernel/pcb.c	/^	uint8_t kstack[4096];$/;"	m	struct:PCB	file:	access:public
 PCB::link	kernel/pcb.c	/^	struct PCB *link;$/;"	m	struct:PCB	typeref:struct:PCB::PCB	file:	access:public
-PCB::pgdir	kernel/pcb.c	/^	pde_t pgdir;$/;"	m	struct:PCB	file:	access:public
+PCB::pgdir	kernel/pcb.c	/^	pde_t *pgdir;$/;"	m	struct:PCB	file:	access:public
+PCB::sleeptime	kernel/pcb.c	/^	uint32_t sleeptime;$/;"	m	struct:PCB	file:	access:public
 PCB::state	kernel/pcb.c	/^	uint8_t state;$/;"	m	struct:PCB	file:	access:public
-PCB::tf	kernel/loader.c	/^	void *tf;$/;"	m	struct:PCB	file:	access:public
 PCB::time_slice	kernel/pcb.c	/^	uint32_t time_slice;$/;"	m	struct:PCB	file:	access:public
 PDX	include/mmu.h	33;"	d
 PDXSHIFT	include/mmu.h	55;"	d
@@ -300,7 +298,7 @@ SCR_HEIGHT	include/video.h	8;"	d
 SCR_SIZE	include/video.h	9;"	d
 SCR_WIDTH	include/video.h	7;"	d
 SECTSIZE	boot/main.c	11;"	d	file:
-SECTSIZE	kernel/loader.c	7;"	d	file:
+SECTSIZE	kernel/loader.c	8;"	d	file:
 SEG	include/mmu.h	168;"	d
 SEG	include/mmu.h	198;"	d
 SEG16	include/mmu.h	202;"	d
@@ -449,7 +447,7 @@ _warn	kernel/assert.c	/^_warn(const char *file, int line, const char *fmt,...)$/
 add_node	game/game.c	/^void add_node()$/;"	f
 add_node	game/game.c	/^void add_node();$/;"	p	file:
 align	boot/boot.h	/^	unsigned int align;$/;"	m	struct:ProgramHeader	access:public
-alloc_pcb	kernel/pcb.c	/^void alloc_pcb()$/;"	f
+alloc_pcb	kernel/pcb.c	/^struct PCB * alloc_pcb(pde_t *pgdir)$/;"	f	signature:(pde_t *pgdir)
 asm_do_irq	kernel/irq/do_irq.S	/^asm_do_irq:$/;"	l
 assert	include/assert.h	14;"	d
 blue_screen	include/video.h	/^void blue_screen();$/;"	p	signature:()
@@ -518,6 +516,7 @@ false	include/types.h	/^enum { false, true };$/;"	e	enum:__anon2
 filesz	boot/boot.h	/^	unsigned int filesz;$/;"	m	struct:ProgramHeader	access:public
 flags	boot/boot.h	/^	unsigned int   flags;$/;"	m	struct:ELFHeader	access:public
 flags	boot/boot.h	/^	unsigned int flags;$/;"	m	struct:ProgramHeader	access:public
+fork	lib/interrput.c	/^int fork()$/;"	f
 gameloader	include/loader.h	/^void gameloader(void);$/;"	p	signature:(void)
 gameloader	kernel/loader.c	/^void gameloader(void)$/;"	f	signature:(void)
 gdt	boot/start.S	/^gdt:$/;"	l
@@ -536,6 +535,8 @@ init_idt	kernel/irq/idt.c	/^void init_idt() {$/;"	f
 init_idt	kernel/main.c	/^extern void init_idt();$/;"	p	file:
 init_intr	kernel/irq/i8259.c	/^init_intr(void) {$/;"	f	signature:(void)
 init_intr	kernel/main.c	/^extern void init_intr();$/;"	p	file:
+init_pcb	include/pcb.h	/^void init_pcb();$/;"	p	signature:()
+init_pcb	kernel/pcb.c	/^void init_pcb()$/;"	f
 init_segment	include/kvm.h	/^void init_segment();$/;"	p	signature:()
 init_segment	kernel/kvm.c	/^init_segment(void) {$/;"	f	signature:(void)
 init_serial	kernel/device/serial.c	/^init_serial(void) {$/;"	f	signature:(void)
@@ -554,8 +555,8 @@ int16_t	include/types.h	/^typedef short int16_t;$/;"	t
 int32_t	include/types.h	/^typedef int int32_t;$/;"	t
 int64_t	include/types.h	/^typedef long long int64_t;$/;"	t
 int8_t	include/types.h	/^typedef __signed char int8_t;$/;"	t
-intogame	kernel/loader.c	/^void intogame(uint32_t entry){$/;"	f	signature:(uint32_t entry)
-intogame	kernel/loader.c	/^void intogame(uint32_t);$/;"	p	file:
+intogame	kernel/loader.c	/^void intogame(pde_t* pgdir,uint32_t entry){$/;"	f	signature:(pde_t* pgdir,uint32_t entry)
+intogame	kernel/loader.c	/^void intogame(pde_t*,uint32_t);$/;"	p	file:	signature:(pde_t*,uint32_t)
 intptr_t	include/types.h	/^typedef int32_t intptr_t;$/;"	t
 invlpg	include/x86.h	/^invlpg(void *addr)$/;"	f	signature:(void *addr)
 invlpg	include/x86.h	/^static __inline void invlpg(void *addr) __attribute__((always_inline));$/;"	p	signature:(void *addr)
@@ -569,8 +570,8 @@ irq_empty	kernel/irq/idt.c	/^void irq_empty();$/;"	p	file:
 irq_handle	kernel/irq/irq_handle.c	/^irq_handle(struct TrapFrame *tf) {$/;"	f	signature:(struct TrapFrame *tf)
 key_event	include/keyboard.h	/^void key_event(int);$/;"	p	signature:(int)
 key_event	kernel/device/keyborad.c	/^void key_event(int code)$/;"	f	signature:(int code)
-kstack	kernel/loader.c	/^	uint8_t kstack[4096];$/;"	m	struct:PCB	file:	access:public
 kstack	kernel/pcb.c	/^	uint8_t kstack[4096];$/;"	m	struct:PCB	file:	access:public
+kstack_prepare	kernel/pcb.c	/^uint32_t kstack_prepare(struct PCB* newpcb,uint32_t entry)$/;"	f	signature:(struct PCB* newpcb,uint32_t entry)
 lcr0	include/x86.h	/^lcr0(uint32_t val)$/;"	f	signature:(uint32_t val)
 lcr0	include/x86.h	/^static __inline void lcr0(uint32_t val) __attribute__((always_inline));$/;"	p	signature:(uint32_t val)
 lcr3	include/x86.h	/^lcr3(uint32_t val)$/;"	f	signature:(uint32_t val)
@@ -652,15 +653,16 @@ pages	kernel/pmap.c	/^struct PageInfo pages[npages];		\/\/ Physical page state a
 panic	include/assert.h	12;"	d
 panicstr	kernel/assert.c	/^const char *panicstr;$/;"	v
 pcb_free_list	kernel/pcb.c	/^static struct PCB *pcb_free_list;$/;"	v	typeref:struct:PCB	file:
-pcb_init	kernel/pcb.c	/^void pcb_init();$/;"	p	file:
 pcb_running_list	kernel/pcb.c	/^static struct PCB *pcb_running_list;$/;"	v	typeref:struct:PCB	file:
+pcb_sleeping	include/pcb.h	/^void pcb_sleeping();$/;"	p	signature:()
+pcb_sleeping	kernel/pcb.c	/^void pcb_sleeping()$/;"	f
 pcb_sleeping_list	kernel/pcb.c	/^static struct PCB *pcb_sleeping_list;$/;"	v	typeref:struct:PCB	file:
 pcb_toberun_list	kernel/pcb.c	/^static struct PCB *pcb_toberun_list;$/;"	v	typeref:struct:PCB	file:
 pcb_unexec_list	kernel/pcb.c	/^static struct PCB *pcb_unexec_list;$/;"	v	typeref:struct:PCB	file:
 pd_base	include/mmu.h	/^	uint32_t pd_base;		\/\/ Base address$/;"	m	struct:Pseudodesc	access:public
 pd_lim	include/mmu.h	/^	uint16_t pd_lim;		\/\/ Limit$/;"	m	struct:Pseudodesc	access:public
 pde_t	include/memlayout.h	/^typedef uint32_t pde_t;$/;"	t
-pgdir	kernel/pcb.c	/^	pde_t pgdir;$/;"	m	struct:PCB	file:	access:public
+pgdir	kernel/pcb.c	/^	pde_t *pgdir;$/;"	m	struct:PCB	file:	access:public
 pgdir_walk	include/pmap.h	/^pte_t *pgdir_walk(pde_t *pgdir, const void *va, int create);$/;"	p	signature:(pde_t *pgdir, const void *va, int create)
 pgdir_walk	kernel/pmap.c	/^pgdir_walk(pde_t *pgdir, const void *va, int create)$/;"	f	signature:(pde_t *pgdir, const void *va, int create)
 phentsize	boot/boot.h	/^	unsigned short phentsize;$/;"	m	struct:ELFHeader	access:public
@@ -683,6 +685,8 @@ printk	kernel/printk.c	/^int	printk(const char *fmt, ...){$/;"	f	signature:(cons
 printnum	lib/printfmt.c	/^printnum(void (*putch)(int, void*), void *putdat,$/;"	f	file:	signature:(void (*putch)(int, void*), void *putdat, unsigned long long num, unsigned base, int width, int padc)
 privilege_level	include/mmu.h	/^	uint32_t privilege_level  : 2;\/\/descriptor(meaning new)privilege$/;"	m	struct:GateDescriptor	access:public
 process	kernel/pcb.c	/^static struct PCB process[NR_PCB];$/;"	v	typeref:struct:PCB	file:
+process_prepare	include/pcb.h	/^uint32_t process_prepare(pde_t*,uint32_t);$/;"	p	signature:(pde_t*,uint32_t)
+process_prepare	kernel/pcb.c	/^uint32_t process_prepare(pde_t *pgdir,uint32_t entry)$/;"	f	signature:(pde_t *pgdir,uint32_t entry)
 pte_t	include/memlayout.h	/^typedef uint32_t pte_t;$/;"	t
 putch	kernel/printk.c	/^static void putch(int ch, int *cnt){$/;"	f	file:	signature:(int ch, int *cnt)
 query_key	include/sysbreak.h	/^int query_key();$/;"	p	signature:()
@@ -748,6 +752,7 @@ shnum	boot/boot.h	/^	unsigned short shnum;$/;"	m	struct:ELFHeader	access:public
 shoff	boot/boot.h	/^	unsigned int   shoff;$/;"	m	struct:ELFHeader	access:public
 shstrndx	boot/boot.h	/^	unsigned short shstrndx;$/;"	m	struct:ELFHeader	access:public
 size_t	include/types.h	/^typedef uint32_t size_t;$/;"	t
+sleeptime	kernel/pcb.c	/^	uint32_t sleeptime;$/;"	m	struct:PCB	file:	access:public
 snprintf	include/stdio.h	/^int	snprintf(char *str, int size, const char *fmt, ...);$/;"	p	signature:(char *str, int size, const char *fmt, ...)
 snprintf	lib/printfmt.c	/^snprintf(char *buf, int n, const char *fmt, ...)$/;"	f	signature:(char *buf, int n, const char *fmt, ...)
 spin	kernel/entry.S	/^spin:	jmp	spin$/;"	l
@@ -788,6 +793,8 @@ strtol	include/string.h	/^long	strtol(const char *s, char **endptr, int base);$/
 strtol	lib/string.c	/^strtol(const char *s, char **endptr, int base)$/;"	f	signature:(const char *s, char **endptr, int base)
 sys_display	include/video.h	/^void sys_display(uint32_t*);$/;"	p	signature:(uint32_t*)
 sys_display	kernel/device/video.c	/^void sys_display(uint32_t* vouter)$/;"	f	signature:(uint32_t* vouter)
+sys_folk	include/pcb.h	/^void sys_folk(struct TrapFrame*);$/;"	p	signature:(struct TrapFrame*)
+sys_folk	kernel/pcb.c	/^int sys_folk(struct TrapFrame *tf)$/;"	f	signature:(struct TrapFrame *tf)
 sys_key_query	include/keyboard.h	/^int sys_key_query();$/;"	p	signature:()
 sys_key_query	kernel/device/keyborad.c	/^int sys_key_query()$/;"	f
 sys_timer_query	include/timer.h	/^int sys_timer_query();$/;"	p	signature:()
@@ -795,7 +802,6 @@ sys_timer_query	kernel/device/timer.c	/^int sys_timer_query()$/;"	f
 system	include/mmu.h	/^	uint32_t system           : 1;\/\/must be 0(system)$/;"	m	struct:GateDescriptor	access:public
 t	game/game.c	/^static Node t[1000];$/;"	v	file:
 test_bomb	game/game.c	/^void test_bomb()$/;"	f
-tf	kernel/loader.c	/^	void *tf;$/;"	m	struct:PCB	file:	access:public
 time_slice	kernel/pcb.c	/^	uint32_t time_slice;$/;"	m	struct:PCB	file:	access:public
 timer_event	include/timer.h	/^void timer_event();$/;"	p	signature:()
 timer_event	kernel/device/timer.c	/^void timer_event(){$/;"	f

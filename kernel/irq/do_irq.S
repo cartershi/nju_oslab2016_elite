@@ -35,6 +35,7 @@
 .extern irq_handle
 asm_do_irq:
 #	subl $8,%esp
+	cli
 	pushl %ds
 	pushl %es
 	pushl %eax
@@ -52,4 +53,5 @@ asm_do_irq:
 	popl %es
 	popl %ds
 	addl $0x8, %esp
+	sti
   	iret

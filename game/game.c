@@ -19,7 +19,23 @@ static int rand()
 	return (seed >> 16) & 0x7FFF;
 }
 int main(){
-	int now=0,target;
+	if (fork()==0)
+	{
+		while (1)
+		{
+		printf("ping\n");
+		sleep(100);
+		}
+	}
+	else
+	{
+		while (1)
+		{
+		printf("pong\n");
+		sleep(200);
+		}
+	}
+	/*int now=0,target;
 	t[0].locx=-10;
 	t[0].locy=10;
 	while (1)
@@ -44,7 +60,7 @@ int main(){
 			now++;
 		}
 	}
-	return 0;
+	return 0;*/
 }
 
 void add_node()

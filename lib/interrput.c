@@ -51,3 +51,24 @@ int query_timer()
 	return time;
 }
 
+int fork()
+{
+	int pid;
+	__asm__("movl $0x5, %%eax\n\t"
+			"int $0x80\n\t"
+			"movl %%eax, %0"
+			:"=r"(pid)
+			:
+			:"%eax");
+	return pid;
+}
+
+void sleep(int sleeptime)
+{
+	__asm__("movl $0x6, %%eax\n\t"
+			"movl %0, %%ecx\n\t"
+			"int $0x80"
+			:
+			:"r"(sleeptime)
+			:"%eax","%ecx");
+}

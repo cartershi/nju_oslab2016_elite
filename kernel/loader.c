@@ -23,7 +23,7 @@ void gameloader(void)
 	unsigned int phentsize=elf->phentsize;
 	unsigned int phnum=elf->phnum;
 	struct PageInfo *pp;
-	pde_t *pgdir=page2kva(page_alloc(0));
+	pde_t *pgdir=page2kva(page_alloc(1));
 	/* Load each program segment */
 	int i=0;
 
@@ -41,7 +41,7 @@ void gameloader(void)
 				unsigned int offset = va & 0xfff;
 				// forced alignment on 4K boundary
 				va &=0xfffff000;
-				pp=page_alloc(0);
+				pp=page_alloc(1);
 				unsigned int *addr=(unsigned int*)page2kva(pp);
 				page_insert(pgdir,pp,(void*)va,PTE_U|PTE_W);
 				// zero the page buffer
@@ -62,10 +62,12 @@ void gameloader(void)
 
 		}
 	}
-	boot_map_region(pgdir,0xc5000000,10*1024*1024,0x5000000,PTE_U);
+	//boot_map_region(pgdir,0xc5000000,10*1024*1024,0x5000000,PTE_U);
 	uint32_t stackss=0xc0000000-PGSIZE;
-	page_insert(pgdir,page_alloc(0),(void *)stackss,PTE_U|PTE_W);
-	*(pgdir+0x300)=*((pte_t *)(rcr3()+KERNBASE)+0x300);
+	pp=page_alloc(1);
+	page_insert(pgdir,pp,(void *)stackss,PTE_U|PTE_W);
+	for (i=0; i<128/4; i++)
+	*(pgdir+0x300+i)=*((pte_t *)(rcr3()+KERNBASE)+0x300+i);
 	*(pgdir)=*((pte_t *)(rcr3()+KERNBASE));
 	lcr3((unsigned int)(pgdir)-KERNBASE);
 	volatile uint32_t entry = elf->entry;
@@ -73,7 +75,7 @@ void gameloader(void)
 }
 
 void intogame(pde_t* pgdir,uint32_t entry){
-	/*struct TrapFrame ss;
+	struct TrapFrame ss;
 	struct TrapFrame *tf=&ss;
 	tf->edi=0;
 	tf->esi=0;
@@ -87,19 +89,19 @@ void intogame(pde_t* pgdir,uint32_t entry){
 	tf->irq=0x80;
 	tf->eip=entry;
 	tf->cs=(SELECTOR_USER(SEG_USER_CODE));
-	change_tss(0xc5100000);
 	tf->esp=0xbfffffff;
 	tf->ss=(SELECTOR_USER(SEG_USER_DATA));
-	tf->ds=tf->es=(SELECTOR_USER(SEG_USER_DATA));*/
-	uint32_t tf=process_prepare(pgdir,entry);
-	__asm__("movl %0,%%esp"::"r"(tf));
+	tf->ds=tf->es=(SELECTOR_USER(SEG_USER_DATA));
+	process_prepare(pgdir,tf);
+	runprocess();
+	/*__asm__("movl %0,%%esp"::"r"(ref));
 	__asm__("popa");
 	__asm__("popl %es");
 	__asm__("popl %ds");
 	//__asm__("popl %0,");
 	__asm__("addl $8, %%esp"::);
 	__asm__("iret");
-	
+	*/
 }
 
 void

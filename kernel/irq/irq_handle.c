@@ -4,6 +4,7 @@
 #include "include/video.h"
 #include "include/keyboard.h"
 #include "include/timer.h"
+#include "include/pcb.h"
 
 static void (*do_timer)(void);
 static void (*do_keyboard)(int);
@@ -40,6 +41,7 @@ irq_handle(struct TrapFrame *tf) {
 	if (tf->irq == 1000) {
 		//printk("timer\n");
 		do_timer();
+		pcb_sleeping();		
 	} else if (tf->irq == 1001) {
 		uint32_t code = inb(0x60);
 		uint32_t val = inb(0x61);
@@ -68,6 +70,13 @@ void do_syscall(struct TrapFrame *tf){
 		case 4:
 			tf->ecx=sys_timer_query();
 			break;
+		case 5:
+			sys_fork(tf);
+			runprocess();
+			break;
+		case 6:
+			pcb_tosleep(tf->ecx,tf);
+			runprocess();
 		break;
 		default: break;
 		//case SYS_prink:
