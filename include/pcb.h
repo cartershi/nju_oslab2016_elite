@@ -6,3 +6,4 @@ void runprocess();
 void pcb_sleeping();
 void sys_fork(struct TrapFrame*);
 void pcb_tosleep(int,struct TrapFrame*);
+void pcb_exit();

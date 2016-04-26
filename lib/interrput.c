@@ -72,3 +72,12 @@ void sleep(int sleeptime)
 			:"r"(sleeptime)
 			:"%eax","%ecx");
 }
+
+void exit()
+{
+	__asm__("movl $0x7, %%eax\n\t"
+			"int $0x80"
+			:
+			:
+			:"%eax");
+}

@@ -19,12 +19,15 @@ static int rand()
 	return (seed >> 16) & 0x7FFF;
 }
 int main(){
+	int i=0;
 	if (fork()==0)
 	{
 		while (1)
 		{
+			i++;
 		printf("ping\n");
 		sleep(100);
+		if (i==5) exit();
 		}
 	}
 	else
@@ -32,6 +35,7 @@ int main(){
 		while (1)
 		{
 		printf("pong\n");
+		i++;
 		sleep(200);
 		}
 	}

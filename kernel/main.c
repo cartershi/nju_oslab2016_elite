@@ -11,8 +11,6 @@ extern void init_serial();
 
 int main()
 {
-	unsigned int num=KERNBASE;
-	int i;
 	init_serial();
 	init_idt();
 	init_intr();
@@ -21,12 +19,8 @@ int main()
 	set_timer_intr_handler(timer_event);
 	init_segment();
 	page_init();
-	for (i=1; i<=32; i++)
-	{
 		boot_map_region((void*)(rcr3()+0xc0000000),
-				num,(unsigned long)128*1024*1024,0,PTE_P);
-		num+=128*1024*1024;
-	}
+				KERNBASE,(unsigned long)128*1024*1024,0,PTE_P);
 	enable_interrupt();
 	init_pcb();
 	gameloader();

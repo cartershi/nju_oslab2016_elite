@@ -212,6 +212,28 @@ void pcb_tosleep(int sleeptime,struct TrapFrame *tf)
 	pcb_sleeping_list=node;
 }
 
+
+void pcb_exit()
+{
+	struct PCB *node=pcb_running_list;
+	pcb_running_list=pcb_running_list->link;
+	node->link=pcb_free_list;
+	pcb_free_list=node;
+	pde_t *pgdir=node->pgdir;
+	*pgdir=0;
+	uint32_t va=1<<22;
+	while (va<KERNBASE)
+	{
+		page_remove(pgdir,(void*)va);
+		va=va+PGSIZE;
+	}
+	va=KERNBASE+128*1024*1024;
+	while (va<0xfffff000)
+	{
+		page_remove(pgdir,(void*)va);
+		va=va+PGSIZE;
+	}
+}
 void process_prepare(pde_t *pgdir,struct TrapFrame* tf)
 {
 	struct PCB* newpcb=alloc_pcb(pgdir);
