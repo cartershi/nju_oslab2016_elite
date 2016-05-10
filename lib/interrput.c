@@ -73,11 +73,23 @@ void sleep(int sleeptime)
 			:"%eax","%ecx");
 }
 
-void exit()
+void exit(int num)
 {
 	__asm__("movl $0x7, %%eax\n\t"
+			"movl %0, %%ecx\n\t"
 			"int $0x80"
 			:
+			:"r"(num)
+			:"%eax","%ecx");
+}
+
+void thread_create(void *loc,void *para)
+{
+	__asm__("movl $0x8, %%eax\n\t"
+			"movl %0, %%ecx\n\t"
+			"movl %1, %%edx\n\t"
+			"int $0x80"
 			:
-			:"%eax");
+			:"r"(loc),"r"(para)
+			:"%eax","%ecx","%edx");
 }

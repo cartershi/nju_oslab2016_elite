@@ -23,6 +23,7 @@ static struct PCB *pcb_running_list;
 static struct PCB *pcb_toberun_list;
 static struct PCB *pcb_sleeping_list;
 static struct PCB *pcb_unexec_list;
+static struct PCB *pcb_pblock_list;
 
 static uint32_t PID_cnt;
 
@@ -41,6 +42,7 @@ void init_pcb()
 	pcb_toberun_list=NULL;
 	pcb_sleeping_list=NULL;
 	pcb_unexec_list=NULL;
+	pcb_pblock_list=NULL;
 }
 
 struct PCB * alloc_pcb(pde_t *pgdir)
@@ -107,6 +109,39 @@ void sys_fork(struct TrapFrame *tf)
 		((void *)tf-(void*)pcb_running_list->kstack+(void *)allocted->kstack);
 	allocted->tf->eax=0;
 }
+
+void sys_thread_create(struct TrapFrame *tf,void* functionloc,void *arg)
+{
+	int i;
+	pde_t *pgdir=(pde_t *)(rcr3()+KERNBASE);
+	pde_t *newpgdir=page2kva(page_alloc(1));
+	uint32_t *addr;
+	//for (i=0; i<128/4; i++)	//kernel low copy
+    //	*(newpgdir+0x300+i)=*((pte_t *)(pgdir+0x300+i));
+	for (i=0; i<1024; i++)	//pgae low copy
+		*(newpgdir+i)=*(pte_t*)(pgdir+i);
+	uint32_t stackss=KERNBASE-PGSIZE;//user stack
+	*(newpgdir+PDX(stackss))=0;
+	struct PageInfo *pp=page_alloc(1);
+	page_insert(newpgdir,pp,(void*)stackss,PTE_U|PTE_W);
+	addr=(uint32_t*)page2kva(pp);
+	//printk("st %s\n",(char*)arg);
+	//printk("loc %x\n",arg);
+	//printk("add %s\n",(char*)arg);
+	//memcpy(addr,&i,4);
+	memcpy(addr+1023,&arg,4);
+	//printk("considered %x\n",*(addr+1023));
+	pcb_running_list->tf=tf;
+	struct PCB* allocted=alloc_pcb(newpgdir);
+	for (i=0; i<4096; i++)	//stack deep copy
+		allocted->kstack[i]=pcb_running_list->kstack[i];
+	allocted->tf=(struct TrapFrame *)
+		((void *)tf-(void*)pcb_running_list->kstack+(void *)allocted->kstack);
+	allocted->tf->eip=(int)functionloc;
+	allocted->tf->esp=KERNBASE-0x8;
+	//memcpy();
+}
+
 
 void kstack_prepare(struct PCB* newpcb,struct TrapFrame *tf)
 {
@@ -186,8 +221,11 @@ void updaterunninglist()
 }
 void runprocess()
 {
+	updaterunninglist();
 	while (pcb_running_list==process) {//printk("on guy");
 		__asm__("sti");updaterunninglist();}
+	//printk("pid %d\n",pcb_running_list->PID);
+	//printk("eip %x\n",pcb_running_list->tf->eip);
 	lcr3((uint32_t)(pcb_running_list->pgdir)-KERNBASE);
 	change_tss((uint32_t )(pcb_running_list->kstack+4096));
 	__asm__("movl %0,%%esp"::"r"(pcb_running_list->tf));
@@ -213,26 +251,36 @@ void pcb_tosleep(int sleeptime,struct TrapFrame *tf)
 }
 
 
-void pcb_exit()
+void pcb_exit(int way)
 {
+
 	struct PCB *node=pcb_running_list;
 	pcb_running_list=pcb_running_list->link;
 	node->link=pcb_free_list;
 	pcb_free_list=node;
 	pde_t *pgdir=node->pgdir;
-	*pgdir=0;
-	uint32_t va=1<<22;
-	while (va<KERNBASE)
+	if (way==process_exit)
 	{
-		page_remove(pgdir,(void*)va);
-		va=va+PGSIZE;
-	}
-	va=KERNBASE+128*1024*1024;
-	while (va<0xfffff000)
+		*pgdir=0;
+		uint32_t va=1<<22;
+		while (va<KERNBASE)
+		{
+			page_remove(pgdir,(void*)va);
+			va=va+PGSIZE;
+		}
+		va=KERNBASE+128*1024*1024;
+		while (va<0xfffff000)
+		{
+			page_remove(pgdir,(void*)va);
+			va=va+PGSIZE;
+		}
+	};
+	if (way==thread_exit)
 	{
-		page_remove(pgdir,(void*)va);
-		va=va+PGSIZE;
+		page_remove(pgdir,(void*)(KERNBASE-PGSIZE));
+		//for (i=1; i<=n; 
 	}
+	
 }
 void process_prepare(pde_t *pgdir,struct TrapFrame* tf)
 {

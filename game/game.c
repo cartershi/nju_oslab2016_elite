@@ -10,24 +10,43 @@ typedef struct Node_he{
 }Node;
 
 static Node t[1000];
-static int loc=100,seed=2,start_loc=0,end_loc=0;
+static int loc=100,seed=2, start_loc=0,end_loc=0;
 static uint8_t screen[SCR_SIZE];
 
+uint32_t semaphore;
+
+char con[10]="consumer";
+char pro[10]="producer";
 static int rand()
 {
 	seed=0x015A4E35 * seed + 1;
 	return (seed >> 16) & 0x7FFF;
 }
+
+void consumer(char* st)
+{
+	printf("string %s\n",st);
+	exit(2);
+}
+
+void producer(char *st)
+{
+	printf("string %s\n",st);
+	exit(2);
+}
 int main(){
 	int i=0;
+	thread_create(consumer,con);
+	thread_create(producer,pro);
+	//sleep(10000);
 	if (fork()==0)
 	{
 		while (1)
 		{
 			i++;
 		printf("ping\n");
-		sleep(100);
-		if (i==5) exit();
+		sleep(200);
+		if (i==5) exit(0);
 		}
 	}
 	else
@@ -36,9 +55,11 @@ int main(){
 		{
 		printf("pong\n");
 		i++;
-		sleep(200);
+		sleep(100);
+		if (i==6) exit(0);
 		}
 	}
+	exit(0);
 	/*int now=0,target;
 	t[0].locx=-10;
 	t[0].locy=10;

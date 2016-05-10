@@ -7,6 +7,7 @@ int query_key();
 int query_timer();
 int fork();
 void sleep(int);
-void exit();
+void exit(int);
+void thread_create();
 
 #endif

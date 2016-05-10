@@ -78,7 +78,11 @@ void do_syscall(struct TrapFrame *tf){
 			pcb_tosleep(tf->ecx,tf);
 			runprocess();
 		case 7:
-			pcb_exit();
+			pcb_exit(tf->ecx);
+			runprocess();
+		case 8:
+			//printk("thread\n");
+			sys_thread_create(tf,tf->ecx,tf->edx);
 			runprocess();
 		break;
 		default: break;

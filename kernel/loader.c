@@ -51,7 +51,9 @@ void gameloader(void)
 				unsigned int load_byte_num = 4096 - offset;
 				if((ph->filesz - data_loaded) < load_byte_num)
 					load_byte_num = ph->filesz - data_loaded;
-
+				
+				//printk("va %x load_byte %x\n",va,load_byte_num);
+				if (load_byte_num!=0)
 				readseg((void *)(page_buffer + offset),load_byte_num,
 						0x400800+ph->off + data_loaded);
 				memcpy(addr, page_buffer, 4096);
@@ -89,7 +91,7 @@ void intogame(pde_t* pgdir,uint32_t entry){
 	tf->irq=0x80;
 	tf->eip=entry;
 	tf->cs=(SELECTOR_USER(SEG_USER_CODE));
-	tf->esp=0xbfffffff;
+	tf->esp=KERNBASE;//0xbfffffff;
 	tf->ss=(SELECTOR_USER(SEG_USER_DATA));
 	tf->ds=tf->es=(SELECTOR_USER(SEG_USER_DATA));
 	process_prepare(pgdir,tf);
@@ -120,7 +122,6 @@ readsect(void *dst, int offset) {
 	out_byte(0x1F5, offset >> 16);
 	out_byte(0x1F6, (offset >> 24) | 0xE0);
 	out_byte(0x1F7, 0x20);
-
 	waitdisk();
 	for (i = 0; i < SECTSIZE / 4; i ++) {
 		((int *)dst)[i] = in_long(0x1F0);

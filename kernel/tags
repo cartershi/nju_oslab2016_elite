@@ -25,6 +25,7 @@ PCB::link	pcb.c	/^	struct PCB *link;$/;"	m	struct:PCB	typeref:struct:PCB::PCB	fi
 PCB::pgdir	pcb.c	/^	pde_t *pgdir;$/;"	m	struct:PCB	file:	access:public
 PCB::sleeptime	pcb.c	/^	uint32_t sleeptime;$/;"	m	struct:PCB	file:	access:public
 PCB::state	pcb.c	/^	uint8_t state;$/;"	m	struct:PCB	file:	access:public
+PCB::tf	pcb.c	/^	struct TrapFrame *tf;$/;"	m	struct:PCB	typeref:struct:PCB::TrapFrame	file:	access:public
 PCB::time_slice	pcb.c	/^	uint32_t time_slice;$/;"	m	struct:PCB	file:	access:public
 PID	pcb.c	/^	uint32_t PID;$/;"	m	struct:PCB	file:	access:public
 PID_cnt	pcb.c	/^static uint32_t PID_cnt;$/;"	v	file:
@@ -80,7 +81,7 @@ irq_empty	irq/idt.c	/^void irq_empty();$/;"	p	file:
 irq_handle	irq/irq_handle.c	/^irq_handle(struct TrapFrame *tf) {$/;"	f	signature:(struct TrapFrame *tf)
 key_event	device/keyborad.c	/^void key_event(int code)$/;"	f	signature:(int code)
 kstack	pcb.c	/^	uint8_t kstack[4096];$/;"	m	struct:PCB	file:	access:public
-kstack_prepare	pcb.c	/^uint32_t kstack_prepare(struct PCB* newpcb,uint32_t entry)$/;"	f	signature:(struct PCB* newpcb,uint32_t entry)
+kstack_prepare	pcb.c	/^void kstack_prepare(struct PCB* newpcb,struct TrapFrame *tf)$/;"	f	signature:(struct PCB* newpcb,struct TrapFrame *tf)
 link	pcb.c	/^	struct PCB *link;$/;"	m	struct:PCB	typeref:struct:PCB::PCB	file:	access:public
 main	main.c	/^int main()$/;"	f
 npages	pmap.c	5;"	d	file:
@@ -94,24 +95,28 @@ page_lookup	pmap.c	/^page_lookup(pde_t *pgdir, void *va, pte_t **pte_store)$/;"	
 page_remove	pmap.c	/^page_remove(pde_t *pgdir, void *va)$/;"	f	signature:(pde_t *pgdir, void *va)
 pages	pmap.c	/^struct PageInfo pages[npages];		\/\/ Physical page state array$/;"	v	typeref:struct:PageInfo
 panicstr	assert.c	/^const char *panicstr;$/;"	v
+pcb_exit	pcb.c	/^void pcb_exit()$/;"	f
 pcb_free_list	pcb.c	/^static struct PCB *pcb_free_list;$/;"	v	typeref:struct:PCB	file:
+pcb_pblock_list	pcb.c	/^static struct PCB *pcb_pblock_list;$/;"	v	typeref:struct:PCB	file:
 pcb_running_list	pcb.c	/^static struct PCB *pcb_running_list;$/;"	v	typeref:struct:PCB	file:
 pcb_sleeping	pcb.c	/^void pcb_sleeping()$/;"	f
 pcb_sleeping_list	pcb.c	/^static struct PCB *pcb_sleeping_list;$/;"	v	typeref:struct:PCB	file:
 pcb_toberun_list	pcb.c	/^static struct PCB *pcb_toberun_list;$/;"	v	typeref:struct:PCB	file:
+pcb_tosleep	pcb.c	/^void pcb_tosleep(int sleeptime,struct TrapFrame *tf)$/;"	f	signature:(int sleeptime,struct TrapFrame *tf)
 pcb_unexec_list	pcb.c	/^static struct PCB *pcb_unexec_list;$/;"	v	typeref:struct:PCB	file:
 pgdir	pcb.c	/^	pde_t *pgdir;$/;"	m	struct:PCB	file:	access:public
 pgdir_walk	pmap.c	/^pgdir_walk(pde_t *pgdir, const void *va, int create)$/;"	f	signature:(pde_t *pgdir, const void *va, int create)
 prepare_buffer	device/video.c	/^prepare_buffer(void) {$/;"	f	signature:(void)
 printk	printk.c	/^int	printk(const char *fmt, ...){$/;"	f	signature:(const char *fmt, ...)
 process	pcb.c	/^static struct PCB process[NR_PCB];$/;"	v	typeref:struct:PCB	file:
-process_prepare	pcb.c	/^uint32_t process_prepare(pde_t *pgdir,uint32_t entry)$/;"	f	signature:(pde_t *pgdir,uint32_t entry)
+process_prepare	pcb.c	/^void process_prepare(pde_t *pgdir,struct TrapFrame* tf)$/;"	f	signature:(pde_t *pgdir,struct TrapFrame* tf)
 putch	printk.c	/^static void putch(int ch, int *cnt){$/;"	f	file:	signature:(int ch, int *cnt)
 readsect	loader.c	/^readsect(void *dst, int offset) {$/;"	f	signature:(void *dst, int offset)
 readseg	loader.c	/^readseg(unsigned char *pa, int count, int offset) {$/;"	f	signature:(unsigned char *pa, int count, int offset)
 readseg	loader.c	/^void readseg(unsigned char *, int, int);$/;"	p	file:	signature:(unsigned char *, int, int)
 relocated	entry.S	/^relocated:$/;"	l
 right_move	device/keyborad.c	/^static int right_move=0;$/;"	v	file:
+runprocess	pcb.c	/^void runprocess()$/;"	f
 save_idt	irq/idt.c	/^void save_idt();$/;"	p	file:
 save_idt	irq/idt.c	/^void save_idt(void *addr, uint32_t size) {$/;"	f	signature:(void *addr, uint32_t size)
 serial_idle	device/serial.c	/^serial_idle(void) {$/;"	f	file:	signature:(void)
@@ -127,13 +132,16 @@ sleeptime	pcb.c	/^	uint32_t sleeptime;$/;"	m	struct:PCB	file:	access:public
 spin	entry.S	/^spin:	jmp	spin$/;"	l
 state	pcb.c	/^	uint8_t state;$/;"	m	struct:PCB	file:	access:public
 sys_display	device/video.c	/^void sys_display(uint32_t* vouter)$/;"	f	signature:(uint32_t* vouter)
-sys_folk	pcb.c	/^int sys_folk(struct TrapFrame *tf)$/;"	f	signature:(struct TrapFrame *tf)
+sys_fork	pcb.c	/^void sys_fork(struct TrapFrame *tf)$/;"	f	signature:(struct TrapFrame *tf)
 sys_key_query	device/keyborad.c	/^int sys_key_query()$/;"	f
+sys_thread_create	pcb.c	/^void sys_thread_create(struct TrapFrame *tf,void* functionloc,void *arg)$/;"	f	signature:(struct TrapFrame *tf,void* functionloc,void *arg)
 sys_timer_query	device/timer.c	/^int sys_timer_query()$/;"	f
+tf	pcb.c	/^	struct TrapFrame *tf;$/;"	m	struct:PCB	typeref:struct:PCB::TrapFrame	file:	access:public
 time_slice	pcb.c	/^	uint32_t time_slice;$/;"	m	struct:PCB	file:	access:public
 timer_event	device/timer.c	/^void timer_event(){$/;"	f
 tlb_invalidate	pmap.c	/^tlb_invalidate(pde_t *pgdir, void *va)$/;"	f	signature:(pde_t *pgdir, void *va)
 tss	kvm.c	/^static TSS tss; $/;"	v	file:
+updaterunninglist	pcb.c	/^void updaterunninglist()$/;"	f
 vbuf	device/video.c	/^static uint8_t vbuf[SCR_SIZE];$/;"	v	file:
 vec0	irq/idt.c	/^void vec0();$/;"	p	file:
 vec1	irq/idt.c	/^void vec1();$/;"	p	file:

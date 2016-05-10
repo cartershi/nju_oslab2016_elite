@@ -11,6 +11,7 @@ extern void init_serial();
 
 int main()
 {
+	//printk("kernel in\n");
 	init_serial();
 	init_idt();
 	init_intr();
@@ -23,6 +24,7 @@ int main()
 				KERNBASE,(unsigned long)128*1024*1024,0,PTE_P);
 	enable_interrupt();
 	init_pcb();
+	//printk("kernel out\n");
 	gameloader();
 	while (1);
 }
