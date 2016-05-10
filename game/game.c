@@ -13,7 +13,10 @@ static Node t[1000];
 static int loc=100,seed=2, start_loc=0,end_loc=0;
 static uint8_t screen[SCR_SIZE];
 
-uint32_t semaphore;
+semaphore mutex=1;
+semaphore empty=5;
+semaphore full=0;
+int thid[20];
 
 char con[10]="consumer";
 char pro[10]="producer";
@@ -23,22 +26,53 @@ static int rand()
 	return (seed >> 16) & 0x7FFF;
 }
 
-void consumer(char* st)
+void producer(int* st)
 {
-	printf("string %s\n",st);
+	printf("produce start id %d\n",*st);
+	sem_wait(&empty);
+	sem_wait(&mutex);
+	sleep(200);
+	sem_post(&mutex);
+	printf("produce now %d id %d\n",full,*st);
+	sem_post(&full);
+	//printf("end now %d id %d\n",full,*st);
 	exit(2);
 }
 
-void producer(char *st)
+void consumer(int *st)
 {
-	printf("string %s\n",st);
+	printf("consume start id %d \n",*st);
+	sem_wait(&full);
+	sem_wait(&mutex);
+	printf("consume now %d id %d \n",full,*st);
+	sleep(200);
+	sem_post(&mutex);
+	sem_post(&empty);
 	exit(2);
 }
+
 int main(){
 	int i=0;
-	thread_create(consumer,con);
-	thread_create(producer,pro);
-	//sleep(10000);
+	empty=5;
+	full=0;
+	mutex=1;
+	for (i=1; i<=18; i++) thid[i]=i;
+	thread_create(producer,&thid[1]);
+	thread_create(producer,&thid[2]);
+	thread_create(producer,&thid[3]);
+	thread_create(producer,&thid[4]);
+	thread_create(consumer,&thid[5]);
+	thread_create(consumer,&thid[6]);
+	thread_create(consumer,&thid[7]);
+	thread_create(consumer,&thid[8]);
+	//thread_create(consumer,con);
+	//thread_create(producer,&thid[9]);
+	//thread_create(consumer,con);
+	thread_create(producer,&thid[10]);
+	thread_create(producer,&thid[11]);
+	//thread_create(consumer,con);
+	//thread_create(consumer,con);
+	sleep(10000);
 	if (fork()==0)
 	{
 		while (1)

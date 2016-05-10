@@ -9,5 +9,7 @@ int fork();
 void sleep(int);
 void exit(int);
 void thread_create();
+void sem_wait(void *);
+void sem_post(void *);
 
 #endif

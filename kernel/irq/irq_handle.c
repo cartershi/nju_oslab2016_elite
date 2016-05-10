@@ -80,10 +80,22 @@ void do_syscall(struct TrapFrame *tf){
 		case 7:
 			pcb_exit(tf->ecx);
 			runprocess();
+			break;
 		case 8:
 			//printk("thread\n");
 			sys_thread_create(tf,tf->ecx,tf->edx);
 			runprocess();
+			break;
+		case 9:
+			//printk("down\n");
+			sys_sem_down((void *)tf->ecx);
+			runprocess();
+			break;
+		case 10:
+			//printk("up\n");
+			sys_sem_up((void *)tf->ecx);
+			runprocess();
+			break;
 		break;
 		default: break;
 		//case SYS_prink:

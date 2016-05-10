@@ -11,3 +11,5 @@ void sys_fork(struct TrapFrame*);
 void pcb_tosleep(int,struct TrapFrame*);
 void pcb_exit(int);
 void sys_thread_create();
+void sys_sem_down(void *);
+void sys_sem_up(void *);

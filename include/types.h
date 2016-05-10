@@ -27,6 +27,7 @@ typedef int32_t intptr_t;
 typedef uint32_t uintptr_t;
 typedef uint32_t physaddr_t;
 
+typedef int semaphore;
 // Page numbers are 32 bits long.
 typedef uint32_t ppn_t;
 

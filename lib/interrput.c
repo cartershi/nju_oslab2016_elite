@@ -93,3 +93,23 @@ void thread_create(void *loc,void *para)
 			:"r"(loc),"r"(para)
 			:"%eax","%ecx","%edx");
 }
+
+void sem_wait(void *semloc)
+{
+	__asm__("movl $0x9, %%eax\n\t"
+			"movl %0, %%ecx\n\t"
+			"int $0x80"
+			:
+			:"r"(semloc)
+			:"%eax","%ecx");
+}
+
+void sem_post(void *semloc)
+{
+	__asm__("movl $0xA, %%eax\n\t"
+			"movl %0, %%ecx\n\t"
+			"int $0x80"
+			:
+			:"r"(semloc)
+			:"%eax","%ecx");
+}

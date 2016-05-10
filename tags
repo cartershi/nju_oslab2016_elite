@@ -206,9 +206,9 @@ LD_SCRIPT	Makefile	/^LD_SCRIPT := $(shell find $(KERNEL_DIR) -name "*.ld")$/;"	m
 LIB_C	Makefile	/^LIB_C := $(wildcard $(LIB_DIR)\/*.c)$/;"	m
 LIB_DIR	Makefile	/^LIB_DIR        := lib$/;"	m
 LIB_O	Makefile	/^LIB_O := $(LIB_C:%.c=$(OBJ_DIR)\/%.o)$/;"	m
-MAX	include/types.h	49;"	d
+MAX	include/types.h	50;"	d
 MAXERROR	lib/printfmt.c	/^	MAXERROR$/;"	e	enum:__anon1	file:
-MIN	include/types.h	43;"	d
+MIN	include/types.h	44;"	d
 MMIOBASE	include/memlayout.h	102;"	d
 MMIOLIM	include/memlayout.h	101;"	d
 MULTIBOOT_HEADER_FLAGS	kernel/entry.S	/^#define MULTIBOOT_HEADER_FLAGS (0)$/;"	d
@@ -236,11 +236,13 @@ PARTIAL_UPDATE	kernel/device/video.c	13;"	d	file:
 PCB	kernel/pcb.c	/^struct PCB$/;"	s	file:
 PCB::FA_PID	kernel/pcb.c	/^	uint32_t FA_PID;$/;"	m	struct:PCB	file:	access:public
 PCB::PID	kernel/pcb.c	/^	uint32_t PID;$/;"	m	struct:PCB	file:	access:public
+PCB::blocksem	kernel/pcb.c	/^	uint32_t blocksem;$/;"	m	struct:PCB	file:	access:public
 PCB::kstack	kernel/pcb.c	/^	uint8_t kstack[4096];$/;"	m	struct:PCB	file:	access:public
 PCB::link	kernel/pcb.c	/^	struct PCB *link;$/;"	m	struct:PCB	typeref:struct:PCB::PCB	file:	access:public
 PCB::pgdir	kernel/pcb.c	/^	pde_t *pgdir;$/;"	m	struct:PCB	file:	access:public
 PCB::sleeptime	kernel/pcb.c	/^	uint32_t sleeptime;$/;"	m	struct:PCB	file:	access:public
 PCB::state	kernel/pcb.c	/^	uint8_t state;$/;"	m	struct:PCB	file:	access:public
+PCB::tf	kernel/pcb.c	/^	struct TrapFrame *tf;$/;"	m	struct:PCB	typeref:struct:PCB::TrapFrame	file:	access:public
 PCB::time_slice	kernel/pcb.c	/^	uint32_t time_slice;$/;"	m	struct:PCB	file:	access:public
 PDX	include/mmu.h	33;"	d
 PDXSHIFT	include/mmu.h	55;"	d
@@ -253,6 +255,7 @@ PGSIZE	include/mmu.h	48;"	d
 PID	kernel/pcb.c	/^	uint32_t PID;$/;"	m	struct:PCB	file:	access:public
 PID_cnt	kernel/pcb.c	/^static uint32_t PID_cnt;$/;"	v	file:
 PORT	kernel/printk.c	11;"	d	file:
+PRO_PBLOCK	include/mmu.h	239;"	d
 PRO_RUNNING	include/mmu.h	235;"	d
 PRO_SLEEPING	include/mmu.h	237;"	d
 PRO_TOBERUN	include/mmu.h	236;"	d
@@ -292,8 +295,8 @@ QEMU	Makefile	/^QEMU    := qemu-system-i386$/;"	m
 QEMU_DEBUG_OPTIONS	Makefile	/^QEMU_DEBUG_OPTIONS := -S #启动不执行$/;"	m
 QEMU_OPTIONS	Makefile	/^QEMU_OPTIONS := -serial stdio #以标准输入输为串口(COM1)$/;"	m
 RELOC	kernel/entry.S	/^#define	RELOC(x) ((x) - KERNBASE)$/;"	d
-ROUNDDOWN	include/types.h	58;"	d
-ROUNDUP	include/types.h	64;"	d
+ROUNDDOWN	include/types.h	59;"	d
+ROUNDUP	include/types.h	65;"	d
 SCR_HEIGHT	include/video.h	8;"	d
 SCR_SIZE	include/video.h	9;"	d
 SCR_WIDTH	include/video.h	7;"	d
@@ -324,8 +327,8 @@ SELECTOR_KERNEL	include/mmu.h	154;"	d
 SELECTOR_KERNEL	kernel/irq/do_irq.S	/^#define SELECTOR_KERNEL(s)	( ((s) << 3) | DPL_KERNEL )$/;"	d
 SELECTOR_USER	include/mmu.h	155;"	d
 SERIAL_PORT	kernel/device/serial.c	3;"	d	file:
-SETCALLGATE	include/mmu.h	351;"	d
-SETGATE	include/mmu.h	337;"	d
+SETCALLGATE	include/mmu.h	352;"	d
+SETGATE	include/mmu.h	338;"	d
 SRL	kernel/entry.S	/^#define SRL(val, shamt)		(((val) >> (shamt)) & ~(-1 << (32 - (shamt))))$/;"	d
 STA_A	include/mmu.h	215;"	d
 STA_C	include/mmu.h	212;"	d
@@ -450,6 +453,7 @@ align	boot/boot.h	/^	unsigned int align;$/;"	m	struct:ProgramHeader	access:publi
 alloc_pcb	kernel/pcb.c	/^struct PCB * alloc_pcb(pde_t *pgdir)$/;"	f	signature:(pde_t *pgdir)
 asm_do_irq	kernel/irq/do_irq.S	/^asm_do_irq:$/;"	l
 assert	include/assert.h	14;"	d
+blocksem	kernel/pcb.c	/^	uint32_t blocksem;$/;"	m	struct:PCB	file:	access:public
 blue_screen	include/video.h	/^void blue_screen();$/;"	p	signature:()
 blue_screen	kernel/device/video.c	/^blue_screen(){$/;"	f
 bool	include/types.h	/^typedef _Bool bool;$/;"	t
@@ -466,6 +470,8 @@ change_tss	kernel/kvm.c	/^void change_tss(unsigned int loc)$/;"	f	signature:(uns
 cnt	kernel/device/timer.c	/^static int cnt=0;$/;"	v	file:
 cnt	lib/printfmt.c	/^	int cnt;$/;"	m	struct:sprintbuf	file:	access:public
 color	game/game.c	/^	int locx,locy,color;$/;"	m	struct:Node_he	file:	access:public
+con	game/game.c	/^char con[10]="consumer";$/;"	v
+consumer	game/game.c	/^void consumer(char *st)$/;"	f	signature:(char *st)
 cpuid	include/x86.h	/^cpuid(uint32_t info, uint32_t *eaxp, uint32_t *ebxp, uint32_t *ecxp, uint32_t *edxp)$/;"	f	signature:(uint32_t info, uint32_t *eaxp, uint32_t *ebxp, uint32_t *ecxp, uint32_t *edxp)
 cpuid	include/x86.h	/^static __inline void cpuid(uint32_t info, uint32_t *eaxp, uint32_t *ebxp, uint32_t *ecxp, uint32_t *edxp);$/;"	p	signature:(uint32_t info, uint32_t *eaxp, uint32_t *ebxp, uint32_t *ecxp, uint32_t *edxp)
 cs	include/mmu.h	/^	uint32_t eip,cs,eflags;$/;"	m	struct:TrapFrame	access:public
@@ -498,9 +504,10 @@ eflags	include/mmu.h	/^	uint32_t eip,cs,eflags;$/;"	m	struct:TrapFrame	access:pu
 ehsize	boot/boot.h	/^	unsigned short ehsize;$/;"	m	struct:ELFHeader	access:public
 eip	include/mmu.h	/^	uint32_t eip,cs,eflags;$/;"	m	struct:TrapFrame	access:public
 elf	boot/boot.h	/^	unsigned char  elf[12];$/;"	m	struct:ELFHeader	access:public
+empty	game/game.c	/^semaphore empty=5;$/;"	v
 enable_interrupt	include/x86.h	/^enable_interrupt(void){$/;"	f	signature:(void)
 enable_interrupt	include/x86.h	/^static __inline void enable_interrupt(void) __attribute__((always_inline));$/;"	p	signature:(void)
-end_loc	game/game.c	/^static int loc=100,seed=2,start_loc=0,end_loc=0;$/;"	v	file:
+end_loc	game/game.c	/^static int loc=100,seed=2, start_loc=0,end_loc=0;$/;"	v	file:
 entry	boot/boot.h	/^	unsigned int   entry;$/;"	m	struct:ELFHeader	access:public
 entry	kernel/entry.S	/^entry:$/;"	l
 entry_pgdir	kernel/entrypgdir.c	/^pde_t entry_pgdir[NPDENTRIES] = {$/;"	v
@@ -512,11 +519,15 @@ es	include/mmu.h	/^	uint32_t es, ds;$/;"	m	struct:TrapFrame	access:public
 esi	include/mmu.h	/^	uint32_t edi, esi, ebp, xxx, ebx, edx, ecx, eax;$/;"	m	struct:TrapFrame	access:public
 esp	include/mmu.h	/^	uint32_t esp;$/;"	m	struct:TrapFrame	access:public
 esp0	include/mmu.h	/^	uint32_t esp0;         \/\/ Ring 0 Stack pointer and segment selector$/;"	m	struct:__anon4	access:public
+exit	include/sysbreak.h	/^void exit(int);$/;"	p	signature:(int)
+exit	lib/interrput.c	/^void exit(int num)$/;"	f	signature:(int num)
 false	include/types.h	/^enum { false, true };$/;"	e	enum:__anon2
 filesz	boot/boot.h	/^	unsigned int filesz;$/;"	m	struct:ProgramHeader	access:public
 flags	boot/boot.h	/^	unsigned int   flags;$/;"	m	struct:ELFHeader	access:public
 flags	boot/boot.h	/^	unsigned int flags;$/;"	m	struct:ProgramHeader	access:public
+fork	include/sysbreak.h	/^int fork();$/;"	p	signature:()
 fork	lib/interrput.c	/^int fork()$/;"	f
+full	game/game.c	/^semaphore full=0;$/;"	v
 gameloader	include/loader.h	/^void gameloader(void);$/;"	p	signature:(void)
 gameloader	kernel/loader.c	/^void gameloader(void)$/;"	f	signature:(void)
 gdt	boot/start.S	/^gdt:$/;"	l
@@ -571,7 +582,7 @@ irq_handle	kernel/irq/irq_handle.c	/^irq_handle(struct TrapFrame *tf) {$/;"	f	si
 key_event	include/keyboard.h	/^void key_event(int);$/;"	p	signature:(int)
 key_event	kernel/device/keyborad.c	/^void key_event(int code)$/;"	f	signature:(int code)
 kstack	kernel/pcb.c	/^	uint8_t kstack[4096];$/;"	m	struct:PCB	file:	access:public
-kstack_prepare	kernel/pcb.c	/^uint32_t kstack_prepare(struct PCB* newpcb,uint32_t entry)$/;"	f	signature:(struct PCB* newpcb,uint32_t entry)
+kstack_prepare	kernel/pcb.c	/^void kstack_prepare(struct PCB* newpcb,struct TrapFrame *tf)$/;"	f	signature:(struct PCB* newpcb,struct TrapFrame *tf)
 lcr0	include/x86.h	/^lcr0(uint32_t val)$/;"	f	signature:(uint32_t val)
 lcr0	include/x86.h	/^static __inline void lcr0(uint32_t val) __attribute__((always_inline));$/;"	p	signature:(uint32_t val)
 lcr3	include/x86.h	/^lcr3(uint32_t val)$/;"	f	signature:(uint32_t val)
@@ -585,7 +596,7 @@ link	include/mmu.h	/^	uint32_t link;         \/\/ old ts selector$/;"	m	struct:_
 link	kernel/pcb.c	/^	struct PCB *link;$/;"	m	struct:PCB	typeref:struct:PCB::PCB	file:	access:public
 lldt	include/x86.h	/^lldt(uint16_t sel)$/;"	f	signature:(uint16_t sel)
 lldt	include/x86.h	/^static __inline void lldt(uint16_t sel) __attribute__((always_inline));$/;"	p	signature:(uint16_t sel)
-loc	game/game.c	/^static int loc=100,seed=2,start_loc=0,end_loc=0;$/;"	v	file:
+loc	game/game.c	/^static int loc=100,seed=2, start_loc=0,end_loc=0;$/;"	v	file:
 locx	game/game.c	/^	int locx,locy,color;$/;"	m	struct:Node_he	file:	access:public
 locy	game/game.c	/^	int locx,locy,color;$/;"	m	struct:Node_he	file:	access:public
 log2	include/stdio.h	24;"	d
@@ -609,13 +620,14 @@ memset	lib/string.c	/^memset(void *v, int c, size_t n)$/;"	f	signature:(void *v,
 memsz	boot/boot.h	/^	unsigned int memsz;$/;"	m	struct:ProgramHeader	access:public
 move_node	game/game.c	/^void move_node()$/;"	f
 move_node	game/game.c	/^void move_node();$/;"	p	file:
+mutex	game/game.c	/^semaphore mutex=1;$/;"	v
 npages	include/pmap.h	/^static size_t npages=1<<15;$/;"	v
 npages	kernel/pmap.c	5;"	d	file:
 off	boot/boot.h	/^	unsigned int off;$/;"	m	struct:ProgramHeader	access:public
 off_t	include/types.h	/^typedef int32_t off_t;$/;"	t
 offset_15_0	include/mmu.h	/^	uint32_t offset_15_0      : 16;\/\/low 16bit of offset in segment$/;"	m	struct:GateDescriptor	access:public
 offset_31_16	include/mmu.h	/^	uint32_t offset_31_16     : 16;\/\/high bits of offset in segment$/;"	m	struct:GateDescriptor	access:public
-offsetof	include/types.h	75;"	d
+offsetof	include/types.h	76;"	d
 out_byte	boot/boot.h	/^out_byte(short port, char data) {$/;"	f	signature:(short port, char data)
 outb	include/x86.h	/^outb(int port, uint8_t data)$/;"	f	signature:(int port, uint8_t data)
 outb	include/x86.h	/^static __inline void outb(int port, uint8_t data) __attribute__((always_inline));$/;"	p	signature:(int port, uint8_t data)
@@ -652,12 +664,17 @@ page_remove	kernel/pmap.c	/^page_remove(pde_t *pgdir, void *va)$/;"	f	signature:
 pages	kernel/pmap.c	/^struct PageInfo pages[npages];		\/\/ Physical page state array$/;"	v	typeref:struct:PageInfo
 panic	include/assert.h	12;"	d
 panicstr	kernel/assert.c	/^const char *panicstr;$/;"	v
+pcb_exit	include/pcb.h	/^void pcb_exit(int);$/;"	p	signature:(int)
+pcb_exit	kernel/pcb.c	/^void pcb_exit(int way)$/;"	f	signature:(int way)
 pcb_free_list	kernel/pcb.c	/^static struct PCB *pcb_free_list;$/;"	v	typeref:struct:PCB	file:
+pcb_pblock_list	kernel/pcb.c	/^static struct PCB *pcb_pblock_list;$/;"	v	typeref:struct:PCB	file:
 pcb_running_list	kernel/pcb.c	/^static struct PCB *pcb_running_list;$/;"	v	typeref:struct:PCB	file:
 pcb_sleeping	include/pcb.h	/^void pcb_sleeping();$/;"	p	signature:()
 pcb_sleeping	kernel/pcb.c	/^void pcb_sleeping()$/;"	f
 pcb_sleeping_list	kernel/pcb.c	/^static struct PCB *pcb_sleeping_list;$/;"	v	typeref:struct:PCB	file:
 pcb_toberun_list	kernel/pcb.c	/^static struct PCB *pcb_toberun_list;$/;"	v	typeref:struct:PCB	file:
+pcb_tosleep	include/pcb.h	/^void pcb_tosleep(int,struct TrapFrame*);$/;"	p	signature:(int,struct TrapFrame*)
+pcb_tosleep	kernel/pcb.c	/^void pcb_tosleep(int sleeptime,struct TrapFrame *tf)$/;"	f	signature:(int sleeptime,struct TrapFrame *tf)
 pcb_unexec_list	kernel/pcb.c	/^static struct PCB *pcb_unexec_list;$/;"	v	typeref:struct:PCB	file:
 pd_base	include/mmu.h	/^	uint32_t pd_base;		\/\/ Base address$/;"	m	struct:Pseudodesc	access:public
 pd_lim	include/mmu.h	/^	uint16_t pd_lim;		\/\/ Limit$/;"	m	struct:Pseudodesc	access:public
@@ -684,9 +701,12 @@ printk	include/stdio.h	/^int	printk(const char *fmt, ...);$/;"	p	signature:(cons
 printk	kernel/printk.c	/^int	printk(const char *fmt, ...){$/;"	f	signature:(const char *fmt, ...)
 printnum	lib/printfmt.c	/^printnum(void (*putch)(int, void*), void *putdat,$/;"	f	file:	signature:(void (*putch)(int, void*), void *putdat, unsigned long long num, unsigned base, int width, int padc)
 privilege_level	include/mmu.h	/^	uint32_t privilege_level  : 2;\/\/descriptor(meaning new)privilege$/;"	m	struct:GateDescriptor	access:public
+pro	game/game.c	/^char pro[10]="producer";$/;"	v
 process	kernel/pcb.c	/^static struct PCB process[NR_PCB];$/;"	v	typeref:struct:PCB	file:
-process_prepare	include/pcb.h	/^uint32_t process_prepare(pde_t*,uint32_t);$/;"	p	signature:(pde_t*,uint32_t)
-process_prepare	kernel/pcb.c	/^uint32_t process_prepare(pde_t *pgdir,uint32_t entry)$/;"	f	signature:(pde_t *pgdir,uint32_t entry)
+process_exit	include/pcb.h	3;"	d
+process_prepare	include/pcb.h	/^void process_prepare(pde_t*,struct TrapFrame*);$/;"	p	signature:(pde_t*,struct TrapFrame*)
+process_prepare	kernel/pcb.c	/^void process_prepare(pde_t *pgdir,struct TrapFrame* tf)$/;"	f	signature:(pde_t *pgdir,struct TrapFrame* tf)
+producer	game/game.c	/^void producer(char* st)$/;"	f	signature:(char* st)
 pte_t	include/memlayout.h	/^typedef uint32_t pte_t;$/;"	t
 putch	kernel/printk.c	/^static void putch(int ch, int *cnt){$/;"	f	file:	signature:(int ch, int *cnt)
 query_key	include/sysbreak.h	/^int query_key();$/;"	p	signature:()
@@ -718,6 +738,8 @@ readseg	kernel/loader.c	/^readseg(unsigned char *pa, int count, int offset) {$/;
 readseg	kernel/loader.c	/^void readseg(unsigned char *, int, int);$/;"	p	file:	signature:(unsigned char *, int, int)
 relocated	kernel/entry.S	/^relocated:$/;"	l
 right_move	kernel/device/keyborad.c	/^static int right_move=0;$/;"	v	file:
+runprocess	include/pcb.h	/^void runprocess();$/;"	p	signature:()
+runprocess	kernel/pcb.c	/^void runprocess()$/;"	f
 save_idt	kernel/irq/idt.c	/^void save_idt();$/;"	p	file:
 save_idt	kernel/irq/idt.c	/^void save_idt(void *addr, uint32_t size) {$/;"	f	signature:(void *addr, uint32_t size)
 screen	game/game.c	/^static uint8_t screen[SCR_SIZE];$/;"	v	file:
@@ -734,8 +756,13 @@ sd_p	include/mmu.h	/^	unsigned sd_p : 1;          \/\/ Present$/;"	m	struct:Segd
 sd_rsv1	include/mmu.h	/^	unsigned sd_rsv1 : 1;       \/\/ Reserved$/;"	m	struct:Segdesc	access:public
 sd_s	include/mmu.h	/^	unsigned sd_s : 1;          \/\/ 0 = system, 1 = application$/;"	m	struct:Segdesc	access:public
 sd_type	include/mmu.h	/^	unsigned sd_type : 4;       \/\/ Segment type (see STS_ constants)$/;"	m	struct:Segdesc	access:public
-seed	game/game.c	/^static int loc=100,seed=2,start_loc=0,end_loc=0;$/;"	v	file:
+seed	game/game.c	/^static int loc=100,seed=2, start_loc=0,end_loc=0;$/;"	v	file:
 segment	include/mmu.h	/^	uint32_t segment          : 16;\/\/segment selector$/;"	m	struct:GateDescriptor	access:public
+sem_post	include/sysbreak.h	/^void sem_post(void *);$/;"	p	signature:(void *)
+sem_post	lib/interrput.c	/^void sem_post(void *semloc)$/;"	f	signature:(void *semloc)
+sem_wait	include/sysbreak.h	/^void sem_wait(void *);$/;"	p	signature:(void *)
+sem_wait	lib/interrput.c	/^void sem_wait(void *semloc)$/;"	f	signature:(void *semloc)
+semaphore	include/types.h	/^typedef int semaphore;$/;"	t
 serial_idle	kernel/device/serial.c	/^serial_idle(void) {$/;"	f	file:	signature:(void)
 serial_printc	kernel/device/serial.c	/^serial_printc(char ch) {$/;"	f	signature:(char ch)
 serial_printc	kernel/printk.c	/^extern void serial_printc(char);$/;"	p	file:	signature:(char)
@@ -752,6 +779,8 @@ shnum	boot/boot.h	/^	unsigned short shnum;$/;"	m	struct:ELFHeader	access:public
 shoff	boot/boot.h	/^	unsigned int   shoff;$/;"	m	struct:ELFHeader	access:public
 shstrndx	boot/boot.h	/^	unsigned short shstrndx;$/;"	m	struct:ELFHeader	access:public
 size_t	include/types.h	/^typedef uint32_t size_t;$/;"	t
+sleep	include/sysbreak.h	/^void sleep(int);$/;"	p	signature:(int)
+sleep	lib/interrput.c	/^void sleep(int sleeptime)$/;"	f	signature:(int sleeptime)
 sleeptime	kernel/pcb.c	/^	uint32_t sleeptime;$/;"	m	struct:PCB	file:	access:public
 snprintf	include/stdio.h	/^int	snprintf(char *str, int size, const char *fmt, ...);$/;"	p	signature:(char *str, int size, const char *fmt, ...)
 snprintf	lib/printfmt.c	/^snprintf(char *buf, int n, const char *fmt, ...)$/;"	f	signature:(char *buf, int n, const char *fmt, ...)
@@ -766,7 +795,7 @@ ss0	include/mmu.h	/^	uint32_t ss0;          \/\/ after an increase in privilege 
 ssize_t	include/types.h	/^typedef int32_t ssize_t;$/;"	t
 start	boot/start.S	/^start:$/;"	l
 start32	boot/start.S	/^start32:$/;"	l
-start_loc	game/game.c	/^static int loc=100,seed=2,start_loc=0,end_loc=0;$/;"	v	file:
+start_loc	game/game.c	/^static int loc=100,seed=2, start_loc=0,end_loc=0;$/;"	v	file:
 state	kernel/pcb.c	/^	uint8_t state;$/;"	m	struct:PCB	file:	access:public
 static_assert	include/assert.h	18;"	d
 strcat	include/string.h	/^char *	strcat(char *dst, const char *src);$/;"	p	signature:(char *dst, const char *src)
@@ -793,15 +822,25 @@ strtol	include/string.h	/^long	strtol(const char *s, char **endptr, int base);$/
 strtol	lib/string.c	/^strtol(const char *s, char **endptr, int base)$/;"	f	signature:(const char *s, char **endptr, int base)
 sys_display	include/video.h	/^void sys_display(uint32_t*);$/;"	p	signature:(uint32_t*)
 sys_display	kernel/device/video.c	/^void sys_display(uint32_t* vouter)$/;"	f	signature:(uint32_t* vouter)
-sys_folk	include/pcb.h	/^void sys_folk(struct TrapFrame*);$/;"	p	signature:(struct TrapFrame*)
-sys_folk	kernel/pcb.c	/^int sys_folk(struct TrapFrame *tf)$/;"	f	signature:(struct TrapFrame *tf)
+sys_fork	include/pcb.h	/^void sys_fork(struct TrapFrame*);$/;"	p	signature:(struct TrapFrame*)
+sys_fork	kernel/pcb.c	/^void sys_fork(struct TrapFrame *tf)$/;"	f	signature:(struct TrapFrame *tf)
 sys_key_query	include/keyboard.h	/^int sys_key_query();$/;"	p	signature:()
 sys_key_query	kernel/device/keyborad.c	/^int sys_key_query()$/;"	f
+sys_sem_down	include/pcb.h	/^void sys_sem_down(void *);$/;"	p	signature:(void *)
+sys_sem_down	kernel/pcb.c	/^void sys_sem_down(void *semloc)$/;"	f	signature:(void *semloc)
+sys_sem_up	include/pcb.h	/^void sys_sem_up(void *);$/;"	p	signature:(void *)
+sys_sem_up	kernel/pcb.c	/^void sys_sem_up(void *semloc)$/;"	f	signature:(void *semloc)
+sys_thread_create	include/pcb.h	/^void sys_thread_create();$/;"	p	signature:()
+sys_thread_create	kernel/pcb.c	/^void sys_thread_create(struct TrapFrame *tf,void* functionloc,void *arg)$/;"	f	signature:(struct TrapFrame *tf,void* functionloc,void *arg)
 sys_timer_query	include/timer.h	/^int sys_timer_query();$/;"	p	signature:()
 sys_timer_query	kernel/device/timer.c	/^int sys_timer_query()$/;"	f
 system	include/mmu.h	/^	uint32_t system           : 1;\/\/must be 0(system)$/;"	m	struct:GateDescriptor	access:public
 t	game/game.c	/^static Node t[1000];$/;"	v	file:
 test_bomb	game/game.c	/^void test_bomb()$/;"	f
+tf	kernel/pcb.c	/^	struct TrapFrame *tf;$/;"	m	struct:PCB	typeref:struct:PCB::TrapFrame	file:	access:public
+thread_create	include/sysbreak.h	/^void thread_create();$/;"	p	signature:()
+thread_create	lib/interrput.c	/^void thread_create(void *loc,void *para)$/;"	f	signature:(void *loc,void *para)
+thread_exit	include/pcb.h	4;"	d
 time_slice	kernel/pcb.c	/^	uint32_t time_slice;$/;"	m	struct:PCB	file:	access:public
 timer_event	include/timer.h	/^void timer_event();$/;"	p	signature:()
 timer_event	kernel/device/timer.c	/^void timer_event(){$/;"	f
@@ -856,6 +895,7 @@ uint32_t	include/types.h	/^typedef unsigned int uint32_t;$/;"	t
 uint64_t	include/types.h	/^typedef unsigned long long uint64_t;$/;"	t
 uint8_t	include/types.h	/^typedef unsigned char uint8_t;$/;"	t
 uintptr_t	include/types.h	/^typedef uint32_t uintptr_t;$/;"	t
+updaterunninglist	kernel/pcb.c	/^void updaterunninglist()$/;"	f
 va2pa	boot/main.c	12;"	d	file:
 va_arg	include/stdarg.h	9;"	d
 va_end	include/stdarg.h	11;"	d

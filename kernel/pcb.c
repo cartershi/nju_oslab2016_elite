@@ -8,6 +8,7 @@ struct PCB
 	uint32_t PID;
 	uint32_t FA_PID;
 	uint8_t state;
+	uint32_t blocksem;
 	uint32_t time_slice;
 	uint32_t sleeptime;
 	pde_t *pgdir;
@@ -142,7 +143,47 @@ void sys_thread_create(struct TrapFrame *tf,void* functionloc,void *arg)
 	//memcpy();
 }
 
+void sys_sem_down(void *semloc)
+{
+	semaphore *sem_now=(semaphore*) semloc;
+	if (*sem_now==0)
+	{
+		struct PCB* node=pcb_running_list;
+		pcb_running_list=pcb_running_list->link;
+		node->blocksem=(uint32_t)semloc;
+		node->link=pcb_pblock_list;
+		pcb_pblock_list=node;
+		node->state=PRO_PBLOCK;
+	}
+	else (*sem_now)--;
+}
 
+void sys_sem_up(void *semloc)
+{
+	semaphore *sem_now=(semaphore*) semloc;
+	struct PCB* node=process;
+	process->link=pcb_pblock_list;
+	struct PCB* hdnode=node;
+	struct PCB* nownode=pcb_pblock_list;
+	int find_flag=0;
+	//printk("%x",semloc);
+	while (nownode!=NULL&&find_flag==0)
+	{
+		if (nownode->blocksem==(uint32_t)semloc) {find_flag=1; break;}
+		hdnode=nownode;
+		nownode=nownode->link;
+	}
+	if (find_flag==1)
+	{
+		hdnode->link=nownode->link;
+		nownode->state=PRO_TOBERUN;
+		nownode->link=pcb_toberun_list;
+		pcb_toberun_list=nownode;
+	}
+	else
+		(*sem_now)++;	
+	pcb_pblock_list=node->link;
+}
 void kstack_prepare(struct PCB* newpcb,struct TrapFrame *tf)
 {
 	uint32_t *kernel_stack=(uint32_t*)newpcb->kstack;

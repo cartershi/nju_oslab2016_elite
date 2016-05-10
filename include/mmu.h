@@ -236,6 +236,7 @@ struct Segdesc {
 #define PRO_TOBERUN  0x2
 #define PRO_SLEEPING 0x3
 #define PRO_UNEXEC   0x4
+#define PRO_PBLOCK   0x5
 
 /*
  *
