@@ -5,6 +5,7 @@
 #include "include/common.h"
 #include "include/pcb.h"
 #include "include/memlayout.h"
+#include "include/filesystem.h"
 #define SECTSIZE 512
 
 void readseg(unsigned char *, int, int);
@@ -13,15 +14,19 @@ void intogame(pde_t*,uint32_t);
 
 void gameloader(void)
 {
+	printk("file in\n");
+	fileinit();
+	printk("file out\n");
 	struct ELFHeader *elf;
 	struct ProgramHeader *ph = NULL;
 	unsigned char buf[4096];
 	unsigned char page_buffer[4096];
-	readseg(buf, 4096, 0x400800);
+	initfileread(buf, 4096, 0);
 	elf = (void*)buf;
 	unsigned int phoff=elf->phoff;
 	unsigned int phentsize=elf->phentsize;
 	unsigned int phnum=elf->phnum;
+	//printk("%x\n",elf->magic);
 	struct PageInfo *pp;
 	pde_t *pgdir=page2kva(page_alloc(1));
 	/* Load each program segment */
@@ -54,8 +59,8 @@ void gameloader(void)
 				
 				//printk("va %x load_byte %x\n",va,load_byte_num);
 				if (load_byte_num!=0)
-				readseg((void *)(page_buffer + offset),load_byte_num,
-						0x400800+ph->off + data_loaded);
+				initfileread((void *)(page_buffer + offset),load_byte_num,
+						ph->off + data_loaded);
 				memcpy(addr, page_buffer, 4096);
 
 				va += 4096;

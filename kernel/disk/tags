@@ -1,0 +1,23 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+IDE_BSY	ide.c	11;"	d	file:
+IDE_DF	ide.c	13;"	d	file:
+IDE_DRDY	ide.c	12;"	d	file:
+IDE_ERR	ide.c	14;"	d	file:
+diskmap	filesystem.c	/^static struct bitmap diskmap;$/;"	v	typeref:struct:bitmap	file:
+diskno	ide.c	/^static int diskno = 1;$/;"	v	file:
+fileinit	filesystem.c	/^void fileinit()$/;"	f
+fileread	filesystem.c	/^void fileread(unsigned char *loc,int cnt,int offset)$/;"	f	signature:(unsigned char *loc,int cnt,int offset)
+ide_probe_disk1	ide.c	/^ide_probe_disk1(void)$/;"	f	signature:(void)
+ide_read	ide.c	/^ide_read(uint32_t secno, void *dst, size_t nsecs)$/;"	f	signature:(uint32_t secno, void *dst, size_t nsecs)
+ide_set_disk	ide.c	/^ide_set_disk(int d)$/;"	f	signature:(int d)
+ide_wait_ready	ide.c	/^ide_wait_ready(bool check_error)$/;"	f	file:	signature:(bool check_error)
+ide_write	ide.c	/^ide_write(uint32_t secno, const void *src, size_t nsecs)$/;"	f	signature:(uint32_t secno, const void *src, size_t nsecs)
+initblock	filesystem.c	/^uint32_t initblock[512\/4];$/;"	v
+initfileread	filesystem.c	/^void initfileread(unsigned char *loc,int cnt,int offset)$/;"	f	signature:(unsigned char *loc,int cnt,int offset)
+root	filesystem.c	/^static struct dir root;$/;"	v	typeref:struct:dir	file:
+tmpblock	filesystem.c	/^static struct block tmpblock;$/;"	v	typeref:struct:block	file:

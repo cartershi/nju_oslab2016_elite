@@ -52,7 +52,7 @@ void consumer(int *st)
 }
 
 int main(){
-	int i=0;
+	/*int i=0;
 	empty=5;
 	full=0;
 	mutex=1;
@@ -93,8 +93,8 @@ int main(){
 		if (i==6) exit(0);
 		}
 	}
-	exit(0);
-	/*int now=0,target;
+	exit(0);*/
+	int now=0,target;
 	t[0].locx=-10;
 	t[0].locy=10;
 	while (1)
@@ -119,7 +119,7 @@ int main(){
 			now++;
 		}
 	}
-	return 0;*/
+	return 0;
 }
 
 void add_node()
