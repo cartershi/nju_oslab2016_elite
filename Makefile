@@ -2,6 +2,7 @@ BOOT   := boot.bin
 KERNEL := kernel.bin
 IMAGE  := disk.bin
 GAME   := game.bin
+DISKMAP:= diskmap.bin
 
 CC      := gcc
 LD      := ld
@@ -33,10 +34,12 @@ LIB_DIR        := lib
 BOOT_DIR       := boot
 KERNEL_DIR     := kernel
 GAME_DIR       := game
+DISKMAP_DIR	   := diskmap
 OBJ_LIB_DIR    := $(OBJ_DIR)/$(LIB_DIR)
 OBJ_BOOT_DIR   := $(OBJ_DIR)/$(BOOT_DIR)
 OBJ_KERNEL_DIR := $(OBJ_DIR)/$(KERNEL_DIR)
-OBJ_GAME_DIR := $(OBJ_DIR)/$(GAME_DIR)
+OBJ_GAME_DIR   := $(OBJ_DIR)/$(GAME_DIR)
+OBJ_DISKMAP_DIR:= $(OBJ_DIR)/$(DISKMAP_DIR)
 
 LD_SCRIPT := $(shell find $(KERNEL_DIR) -name "*.ld")
 
@@ -56,11 +59,16 @@ KERNEL_O += $(KERNEL_S:%.S=$(OBJ_DIR)/%.o)
 GAME_C := $(wildcard $(GAME_DIR)/*.c)
 GAME_O := $(GAME_C:%.c=$(OBJ_DIR)/%.o)
 
-$(IMAGE): $(BOOT) $(KERNEL) $(GAME)
+DISKMAP_C := $(wildcard $(DISKMAP_DIR)/*.c)
+DISKMAP_O := $(DISKMAP_C:%.c=$(OBJ_DIR)/%.o)
+
+
+$(IMAGE): $(BOOT) $(KERNEL) $(GAME) $(DISKMAP)
 	@$(DD) if=/dev/zero of=$(IMAGE) count=10000         > /dev/null # 准备磁盘文件
 	@$(DD) if=$(BOOT) of=$(IMAGE) conv=notrunc          > /dev/null # 填充 boot loader
 	@$(DD) if=$(KERNEL) of=$(IMAGE) seek=1 conv=notrunc > /dev/null # 填充 kernel, 跨过 mbr
-	@$(DD) if=$(GAME) of=$(IMAGE) seek=8197 conv=notrunc> /dev/null
+	./format
+	@$(DD) if=newdisk of=$(IMAGE) seek=8197 conv=notrunc> /dev/null
 
 $(BOOT): $(BOOT_O)
 	$(LD) -e start -Ttext=0x7C00 -m elf_i386 -nostdlib -o $@.out $^
@@ -92,10 +100,16 @@ $(OBJ_KERNEL_DIR)/%.o: $(KERNEL_DIR)/%.[cS]
 $(GAME): $(GAME_O) $(LIB_O)
 	$(LD) -e main -m elf_i386 -nostdlib -o $@ $^ $(shell $(CC) $(CFLAGS) -print-libgcc-file-name)
 
-
 $(OBJ_GAME_DIR)/%.o: $(GAME_DIR)/%.c
 	mkdir -p $(OBJ_DIR)/$(dir $<)
 	$(CC) $(CFLAGS) $< -o $@
+
+
+$(DISKMAP): $(DISKMAP_O)
+
+$(OBJ_DISKMAP_DIR)/%.o: $(DISKMAP_DIR)/%.c
+	mkdir -p $(OBJ_DIR)/$(dir $<)
+	$(CC) -Wall -Werror -Wfatal-errors $< -o $@
 
 DEPS := $(shell find -name "*.d")
 -include $(DEPS)
@@ -121,3 +135,5 @@ clean:
 	@rm -rf $(KERNEL)  2> /dev/null
 	@rm -rf $(IMAGE)   2> /dev/null
 	@rm -rf $(GAME)   2> /dev/null
+	@rm -rf $(DISKMAP)   2> /dev/null
+	@rm -f newdisk   2> /dev/null
