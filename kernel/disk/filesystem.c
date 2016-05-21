@@ -97,3 +97,37 @@ void fileread(unsigned char *loc,int cnt,int offset,struct myFCB *dest)
 		readserial++;
 	}
 }
+
+void filewrite(unsigned char *loc,int cnt,int offset,struct myFCB *dest)
+{
+	dest->pointer=dest->pointer+cnt;
+	if (dest->pointer>dest->size) dest->pointer=dest->size;
+	int readserial=offset/512;
+	int readloc=readserial*512;
+	int startloc,neednum;
+	while (cnt>0)
+	{
+		ide_read((diskoffset+baseoffset)/512+dest->infoblock[readserial]
+				,tmpblock.data,1);
+		//readseg(tmpblock.data,512,
+		//		diskoffset+baseoffset+initblock[readserial]*512);
+		startloc=offset-readloc;	//start place of the block
+		if (cnt>=512-startloc)	//num of needed bytes of the block
+		{
+			cnt=cnt-512+startloc;
+			neednum=512-startloc;
+		}
+		else 
+		{
+			neednum=cnt-startloc;
+			cnt=0;
+		}
+		memcpy(&tmpblock.data[startloc],loc,neednum);
+		ide_write((diskoffset+baseoffset)/512+dest->infoblock[readserial]
+				,tmpblock.data,1);
+		loc=loc+neednum;
+		readloc+=SECTSIZE;
+		offset=readloc;
+		readserial++;
+	}
+}

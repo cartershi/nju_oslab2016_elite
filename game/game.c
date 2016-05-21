@@ -97,14 +97,17 @@ int main(){
 	//printf("game in\n");
 	int fp=open("1.txt");
 	char readtest[520];
-	read((void *)readtest,514,fp);
-	for (int i=0; i<514; i++)
+	read((void *)readtest,510,fp);
+	for (int i=0; i<510; i++)
 		printf("%c",readtest[i]);
-	lseek(fp,-5);
+	char writetest[20]="hello, world";
+	write(writetest,12,fp);
+	lseek(fp,-20);
 	printf("\n");
-	read((void *)readtest,514,fp);
-	for (int i=0; i<514; i++)
+	read((void *)readtest,20,fp);
+	for (int i=0; i<20; i++)
 		printf("%c",readtest[i]);
+	
 	close(fp);
 	int now=0,target;
 	t[0].locx=-10;

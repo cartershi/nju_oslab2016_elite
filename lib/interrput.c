@@ -159,3 +159,15 @@ void lseek(int fp,int move)
 			:"r"(fp),"r"(move)
 			:"%eax","ecx");
 }
+
+void write(void *dest,int cnt,int fp)
+{
+	__asm__("movl $0xF, %%eax\n\t"
+			"movl %0, %%ecx\n\t"
+			"movl %1, %%edx\n\t"
+			"movl %2, %%ebx\n\t"
+			"int $0x80"
+			:
+			:"m"(dest),"m"(cnt),"m"(fp)
+			:"%eax","%ecx","%edx","%ebx");
+}

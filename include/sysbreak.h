@@ -15,5 +15,6 @@ int open(char*);
 void read(void*,int,int);
 void close(int);
 void lseek(int,int);
+void write(void*,int,int);
 
 #endif

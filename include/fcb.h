@@ -11,6 +11,7 @@ struct myFCB
 
 void fcbinit();
 void sys_file_close(int fp);
-void sys_file_read(unsigned char *loc,int fp,int cnt);
 int sys_file_open(char *openname);
 void sys_file_seek(int,int);
+void sys_file_read(unsigned char *loc,int fp,int cnt);
+void sys_file_write(unsigned char *loc,int fp,int cnt);

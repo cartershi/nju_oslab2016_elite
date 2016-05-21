@@ -48,6 +48,15 @@ void sys_file_read(unsigned char *loc,int fp,int cnt)
 	fileread(loc,cnt,fcblist[i].pointer,&fcblist[i]);
 }
 
+void sys_file_write(unsigned char *loc,int fp,int cnt)
+{
+	//printk("fp %d cnt %d \n",fp,cnt);
+	int i;
+	for (i=0; i<FCB_NUM; i++)
+		if (fcblist[i].name==fp) break;
+	if (i==FCB_NUM) {printk("NO SUCH FCB TO WRITE\n"); return;}
+	filewrite(loc,cnt,fcblist[i].pointer,&fcblist[i]);
+}
 void sys_file_seek(int fp,int move)
 {
 	int i;

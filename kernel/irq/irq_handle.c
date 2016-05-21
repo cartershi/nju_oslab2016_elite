@@ -109,6 +109,10 @@ void do_syscall(struct TrapFrame *tf){
 		case 14:
 			sys_file_seek(tf->ecx,tf->edx);
 			break;
+		case 15:
+			sys_file_write((unsigned char*)tf->ecx,tf->ebx,tf->edx);
+			break;
+		
 		break;
 		default: break;
 		//case SYS_prink:
