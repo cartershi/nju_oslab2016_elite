@@ -14,9 +14,9 @@ void intogame(pde_t*,uint32_t);
 
 void gameloader(void)
 {
-	printk("file in\n");
+	//printk("file in\n");
 	fileinit();
-	printk("file out\n");
+	//printk("file out\n");
 	struct ELFHeader *elf;
 	struct ProgramHeader *ph = NULL;
 	unsigned char buf[4096];

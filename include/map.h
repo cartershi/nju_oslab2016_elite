@@ -1,7 +1,7 @@
 typedef unsigned char uint8_t;
 typedef unsigned int uint32_t;
 
-#define diskoffset 0x400800
+#define diskoffset 0x400a00
 #define mapnum 512*256
 #define baseoffset 512*256+512
 

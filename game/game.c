@@ -94,6 +94,18 @@ int main(){
 		}
 	}
 	exit(0);*/
+	//printf("game in\n");
+	int fp=open("1.txt");
+	char readtest[520];
+	read((void *)readtest,514,fp);
+	for (int i=0; i<514; i++)
+		printf("%c",readtest[i]);
+	lseek(fp,-5);
+	printf("\n");
+	read((void *)readtest,514,fp);
+	for (int i=0; i<514; i++)
+		printf("%c",readtest[i]);
+	close(fp);
 	int now=0,target;
 	t[0].locx=-10;
 	t[0].locy=10;

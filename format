@@ -1,4 +1,4 @@
 #!/bin/sh
 
-./obj/diskmap/map.o game.bin 
+./obj/diskmap/map.o game.bin 1.txt
 

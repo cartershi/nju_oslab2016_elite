@@ -5,6 +5,7 @@
 #include "include/common.h"
 #include "include/pmap.h"
 #include "include/kvm.h"
+#include "include/fcb.h"
 extern void init_intr();
 extern void init_idt();
 extern void init_serial();
@@ -19,6 +20,7 @@ int main()
 	set_keyboard_intr_handler(key_event);
 	set_timer_intr_handler(timer_event);
 	init_segment();
+	fcbinit();
 	page_init();
 		boot_map_region((void*)(rcr3()+0xc0000000),
 				KERNBASE,(unsigned long)128*1024*1024,0,PTE_P);

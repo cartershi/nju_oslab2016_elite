@@ -68,6 +68,9 @@ E_NO_MEM	lib/printfmt.c	/^	E_NO_MEM	= 4,	\/\/ Request failed due to memory short
 E_NO_SYS	lib/printfmt.c	/^	E_NO_SYS	= 7,	\/\/ Unimplemented system call$/;"	e	enum:__anon1	file:
 E_UNSPECIFIED	lib/printfmt.c	/^	E_UNSPECIFIED	= 1,	\/\/ Unspecified or unknown problem$/;"	e	enum:__anon1	file:
 FA_PID	kernel/pcb.c	/^	uint32_t FA_PID;$/;"	m	struct:PCB	file:	access:public
+FCB_FREE	include/fcb.h	3;"	d
+FCB_NUM	kernel/fcb.c	3;"	d	file:
+FCB_USED	include/fcb.h	4;"	d
 FEC_PR	include/mmu.h	123;"	d
 FEC_U	include/mmu.h	125;"	d
 FEC_WR	include/mmu.h	124;"	d
@@ -115,10 +118,10 @@ GateDescriptor::segment	include/mmu.h	/^	uint32_t segment          : 16;\/\/segm
 GateDescriptor::system	include/mmu.h	/^	uint32_t system           : 1;\/\/must be 0(system)$/;"	m	struct:GateDescriptor	access:public
 GateDescriptor::type	include/mmu.h	/^	uint32_t type             : 4;\/\/type(STS_{TG,IG32,TG32})$/;"	m	struct:GateDescriptor	access:public
 HZ	kernel/device/timer.c	8;"	d	file:
-IDE_BSY	kernel/disk/ide.c	11;"	d	file:
-IDE_DF	kernel/disk/ide.c	13;"	d	file:
-IDE_DRDY	kernel/disk/ide.c	12;"	d	file:
-IDE_ERR	kernel/disk/ide.c	14;"	d	file:
+IDE_BSY	kernel/disk/ide.c	10;"	d	file:
+IDE_DF	kernel/disk/ide.c	12;"	d	file:
+IDE_DRDY	kernel/disk/ide.c	11;"	d	file:
+IDE_ERR	kernel/disk/ide.c	13;"	d	file:
 IMAGE	Makefile	/^IMAGE  := disk.bin$/;"	m
 INTERRUPT_GATE_32	kernel/irq/idt.c	3;"	d	file:
 IOPHYSMEM	include/memlayout.h	92;"	d
@@ -488,6 +491,8 @@ breakpoint	include/x86.h	/^static __inline void breakpoint(void) __attribute__((
 buf	lib/printfmt.c	/^	char *buf;$/;"	m	struct:sprintbuf	file:	access:public
 change_tss	include/kvm.h	/^void change_tss(unsigned int);$/;"	p	signature:(unsigned int)
 change_tss	kernel/kvm.c	/^void change_tss(unsigned int loc)$/;"	f	signature:(unsigned int loc)
+close	include/sysbreak.h	/^void close(int);$/;"	p	signature:(int)
+close	lib/interrput.c	/^void close(int fp)$/;"	f	signature:(int fp)
 cnt	kernel/device/timer.c	/^static int cnt=0;$/;"	v	file:
 cnt	lib/printfmt.c	/^	int cnt;$/;"	m	struct:sprintbuf	file:	access:public
 color	game/game.c	/^	int locx,locy,color;$/;"	m	struct:Node_he	file:	access:public
@@ -516,7 +521,7 @@ disable_interrupt	include/x86.h	/^disable_interrupt(void){$/;"	f	signature:(void
 disable_interrupt	include/x86.h	/^static __inline void disable_interrupt(void) __attribute__((always_inline));$/;"	p	signature:(void)
 diskmap	diskmap/map.c	/^struct bitmap diskmap;$/;"	v	typeref:struct:bitmap
 diskmap	kernel/disk/filesystem.c	/^static struct bitmap diskmap;$/;"	v	typeref:struct:bitmap	file:
-diskno	kernel/disk/ide.c	/^static int diskno = 1;$/;"	v	file:
+diskno	kernel/disk/ide.c	/^static int diskno = 0;$/;"	v	file:
 diskoffset	include/map.h	4;"	d
 display_buffer	include/video.h	/^void display_buffer();$/;"	p	signature:()
 display_buffer	kernel/device/video.c	/^display_buffer(void) {$/;"	f	signature:(void)
@@ -565,13 +570,20 @@ esp0	include/mmu.h	/^	uint32_t esp0;         \/\/ Ring 0 Stack pointer and segme
 exit	include/sysbreak.h	/^void exit(int);$/;"	p	signature:(int)
 exit	lib/interrput.c	/^void exit(int num)$/;"	f	signature:(int num)
 false	include/types.h	/^enum { false, true };$/;"	e	enum:__anon2
+fcbinit	include/fcb.h	/^void fcbinit();$/;"	p	signature:()
+fcbinit	kernel/fcb.c	/^void fcbinit()$/;"	f
+fcblist	kernel/fcb.c	/^static struct myFCB fcblist[FCB_NUM];$/;"	v	typeref:struct:myFCB	file:
 file_size	diskmap/map.h	/^	uint32_t file_size;$/;"	m	struct:dirent	access:public
 file_size	include/map.h	/^	uint32_t file_size;$/;"	m	struct:dirent	access:public
+filecnt	kernel/fcb.c	/^static int filecnt=0;$/;"	v	file:
+filefind	include/filesystem.h	/^void filefind(struct myFCB*, char*);$/;"	p	signature:(struct myFCB*, char*)
+filefind	kernel/disk/filesystem.c	/^void filefind(struct myFCB *dest,char *openname)$/;"	f	signature:(struct myFCB *dest,char *openname)
 fileinit	include/filesystem.h	/^void fileinit();$/;"	p	signature:()
 fileinit	kernel/disk/filesystem.c	/^void fileinit()$/;"	f
 filename	diskmap/map.h	/^	char filename[24];$/;"	m	struct:dirent	access:public
 filename	include/map.h	/^	char filename[24];$/;"	m	struct:dirent	access:public
-fileread	kernel/disk/filesystem.c	/^void fileread(unsigned char *loc,int cnt,int offset)$/;"	f	signature:(unsigned char *loc,int cnt,int offset)
+fileread	include/filesystem.h	/^void fileread(unsigned char*, int,int,struct myFCB*);$/;"	p	signature:(unsigned char*, int,int,struct myFCB*)
+fileread	kernel/disk/filesystem.c	/^void fileread(unsigned char *loc,int cnt,int offset,struct myFCB *dest)$/;"	f	signature:(unsigned char *loc,int cnt,int offset,struct myFCB *dest)
 filesz	boot/boot.h	/^	unsigned int filesz;$/;"	m	struct:ProgramHeader	access:public
 flags	boot/boot.h	/^	unsigned int   flags;$/;"	m	struct:ELFHeader	access:public
 flags	boot/boot.h	/^	unsigned int flags;$/;"	m	struct:ProgramHeader	access:public
@@ -603,6 +615,7 @@ in_byte	boot/boot.h	/^in_byte(short port) {$/;"	f	signature:(short port)
 in_long	boot/boot.h	/^in_long(short port) {$/;"	f	signature:(short port)
 inb	include/x86.h	/^inb(int port)$/;"	f	signature:(int port)
 inb	include/x86.h	/^static __inline uint8_t inb(int port) __attribute__((always_inline));$/;"	p	signature:(int port)
+infoblock	include/fcb.h	/^	uint32_t infoblock[512\/4];$/;"	m	struct:myFCB	access:public
 init_idt	kernel/irq/idt.c	/^void init_idt() {$/;"	f
 init_idt	kernel/main.c	/^extern void init_idt();$/;"	p	file:
 init_intr	kernel/irq/i8259.c	/^init_intr(void) {$/;"	f	signature:(void)
@@ -698,6 +711,13 @@ memsz	boot/boot.h	/^	unsigned int memsz;$/;"	m	struct:ProgramHeader	access:publi
 move_node	game/game.c	/^void move_node()$/;"	f
 move_node	game/game.c	/^void move_node();$/;"	p	file:
 mutex	game/game.c	/^semaphore mutex=1;$/;"	v
+myFCB	include/fcb.h	/^struct myFCB$/;"	s
+myFCB::infoblock	include/fcb.h	/^	uint32_t infoblock[512\/4];$/;"	m	struct:myFCB	access:public
+myFCB::name	include/fcb.h	/^	int name,pointer,state,size;$/;"	m	struct:myFCB	access:public
+myFCB::pointer	include/fcb.h	/^	int name,pointer,state,size;$/;"	m	struct:myFCB	access:public
+myFCB::size	include/fcb.h	/^	int name,pointer,state,size;$/;"	m	struct:myFCB	access:public
+myFCB::state	include/fcb.h	/^	int name,pointer,state,size;$/;"	m	struct:myFCB	access:public
+name	include/fcb.h	/^	int name,pointer,state,size;$/;"	m	struct:myFCB	access:public
 npages	include/pmap.h	/^static size_t npages=1<<15;$/;"	v
 npages	kernel/pmap.c	5;"	d	file:
 off	boot/boot.h	/^	unsigned int off;$/;"	m	struct:ProgramHeader	access:public
@@ -705,6 +725,8 @@ off_t	include/types.h	/^typedef int32_t off_t;$/;"	t
 offset_15_0	include/mmu.h	/^	uint32_t offset_15_0      : 16;\/\/low 16bit of offset in segment$/;"	m	struct:GateDescriptor	access:public
 offset_31_16	include/mmu.h	/^	uint32_t offset_31_16     : 16;\/\/high bits of offset in segment$/;"	m	struct:GateDescriptor	access:public
 offsetof	include/types.h	76;"	d
+open	include/sysbreak.h	/^int open(char*);$/;"	p	signature:(char*)
+open	lib/interrput.c	/^int open(char * src)$/;"	f	signature:(char * src)
 out_byte	boot/boot.h	/^out_byte(short port, char data) {$/;"	f	signature:(short port, char data)
 outb	include/x86.h	/^outb(int port, uint8_t data)$/;"	f	signature:(int port, uint8_t data)
 outb	include/x86.h	/^static __inline void outb(int port, uint8_t data) __attribute__((always_inline));$/;"	p	signature:(int port, uint8_t data)
@@ -763,6 +785,7 @@ phentsize	boot/boot.h	/^	unsigned short phentsize;$/;"	m	struct:ELFHeader	access
 phnum	boot/boot.h	/^	unsigned short phnum;$/;"	m	struct:ELFHeader	access:public
 phoff	boot/boot.h	/^	unsigned int   phoff;$/;"	m	struct:ELFHeader	access:public
 physaddr_t	include/types.h	/^typedef uint32_t physaddr_t;$/;"	t
+pointer	include/fcb.h	/^	int name,pointer,state,size;$/;"	m	struct:myFCB	access:public
 pp_link	include/memlayout.h	/^	struct PageInfo *pp_link;$/;"	m	struct:PageInfo	typeref:struct:PageInfo::PageInfo	access:public
 pp_ref	include/memlayout.h	/^	uint16_t pp_ref;$/;"	m	struct:PageInfo	access:public
 ppn_t	include/types.h	/^typedef uint32_t ppn_t;$/;"	t
@@ -799,6 +822,8 @@ rcr3	include/x86.h	/^rcr3(void)$/;"	f	signature:(void)
 rcr3	include/x86.h	/^static __inline uint32_t rcr3(void) __attribute__((always_inline));$/;"	p	signature:(void)
 rcr4	include/x86.h	/^rcr4(void)$/;"	f	signature:(void)
 rcr4	include/x86.h	/^static __inline uint32_t rcr4(void) __attribute__((always_inline));$/;"	p	signature:(void)
+read	include/sysbreak.h	/^void read(void*,int,int);$/;"	p	signature:(void*,int,int)
+read	lib/interrput.c	/^void read(void *dest,int cnt,int fp)$/;"	f	signature:(void *dest,int cnt,int fp)
 read_ebp	include/x86.h	/^read_ebp(void)$/;"	f	signature:(void)
 read_ebp	include/x86.h	/^static __inline uint32_t read_ebp(void) __attribute__((always_inline));$/;"	p	signature:(void)
 read_eflags	include/x86.h	/^read_eflags(void)$/;"	f	signature:(void)
@@ -811,6 +836,7 @@ readsect	boot/main.c	/^readsect(void *dst, int offset) {$/;"	f	signature:(void *
 readsect	kernel/loader.c	/^readsect(void *dst, int offset) {$/;"	f	signature:(void *dst, int offset)
 readseg	boot/main.c	/^readseg(unsigned char *pa, int count, int offset) {$/;"	f	signature:(unsigned char *pa, int count, int offset)
 readseg	boot/main.c	/^void readseg(unsigned char *, int, int);$/;"	p	file:	signature:(unsigned char *, int, int)
+readseg	include/loader.h	/^void readseg(unsigned char *,int,int);$/;"	p	signature:(unsigned char *,int,int)
 readseg	kernel/loader.c	/^readseg(unsigned char *pa, int count, int offset) {$/;"	f	signature:(unsigned char *pa, int count, int offset)
 readseg	kernel/loader.c	/^void readseg(unsigned char *, int, int);$/;"	p	file:	signature:(unsigned char *, int, int)
 relocated	kernel/entry.S	/^relocated:$/;"	l
@@ -857,6 +883,7 @@ shentsize	boot/boot.h	/^	unsigned short shentsize;$/;"	m	struct:ELFHeader	access
 shnum	boot/boot.h	/^	unsigned short shnum;$/;"	m	struct:ELFHeader	access:public
 shoff	boot/boot.h	/^	unsigned int   shoff;$/;"	m	struct:ELFHeader	access:public
 shstrndx	boot/boot.h	/^	unsigned short shstrndx;$/;"	m	struct:ELFHeader	access:public
+size	include/fcb.h	/^	int name,pointer,state,size;$/;"	m	struct:myFCB	access:public
 size_t	include/types.h	/^typedef uint32_t size_t;$/;"	t
 sleep	include/sysbreak.h	/^void sleep(int);$/;"	p	signature:(int)
 sleep	lib/interrput.c	/^void sleep(int sleeptime)$/;"	f	signature:(int sleeptime)
@@ -875,6 +902,7 @@ ssize_t	include/types.h	/^typedef int32_t ssize_t;$/;"	t
 start	boot/start.S	/^start:$/;"	l
 start32	boot/start.S	/^start32:$/;"	l
 start_loc	game/game.c	/^static int loc=100,seed=2, start_loc=0,end_loc=0;$/;"	v	file:
+state	include/fcb.h	/^	int name,pointer,state,size;$/;"	m	struct:myFCB	access:public
 state	kernel/pcb.c	/^	uint8_t state;$/;"	m	struct:PCB	file:	access:public
 static_assert	include/assert.h	18;"	d
 strcat	include/string.h	/^char *	strcat(char *dst, const char *src);$/;"	p	signature:(char *dst, const char *src)
@@ -901,6 +929,12 @@ strtol	include/string.h	/^long	strtol(const char *s, char **endptr, int base);$/
 strtol	lib/string.c	/^strtol(const char *s, char **endptr, int base)$/;"	f	signature:(const char *s, char **endptr, int base)
 sys_display	include/video.h	/^void sys_display(uint32_t*);$/;"	p	signature:(uint32_t*)
 sys_display	kernel/device/video.c	/^void sys_display(uint32_t* vouter)$/;"	f	signature:(uint32_t* vouter)
+sys_file_close	include/fcb.h	/^void sys_file_close(int fp);$/;"	p	signature:(int fp)
+sys_file_close	kernel/fcb.c	/^void sys_file_close(int fp)$/;"	f	signature:(int fp)
+sys_file_open	include/fcb.h	/^int sys_file_open(char *openname);$/;"	p	signature:(char *openname)
+sys_file_open	kernel/fcb.c	/^int sys_file_open(char *openname)$/;"	f	signature:(char *openname)
+sys_file_read	include/fcb.h	/^void sys_file_read(unsigned char *loc,int fp,int cnt);$/;"	p	signature:(unsigned char *loc,int fp,int cnt)
+sys_file_read	kernel/fcb.c	/^void sys_file_read(unsigned char *loc,int fp,int cnt)$/;"	f	signature:(unsigned char *loc,int fp,int cnt)
 sys_fork	include/pcb.h	/^void sys_fork(struct TrapFrame*);$/;"	p	signature:(struct TrapFrame*)
 sys_fork	kernel/pcb.c	/^void sys_fork(struct TrapFrame *tf)$/;"	f	signature:(struct TrapFrame *tf)
 sys_key_query	include/keyboard.h	/^int sys_key_query();$/;"	p	signature:()

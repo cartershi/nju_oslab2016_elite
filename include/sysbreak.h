@@ -11,5 +11,9 @@ void exit(int);
 void thread_create();
 void sem_wait(void *);
 void sem_post(void *);
+int open(char*);
+void read(void*,int,int);
+void close(int);
+void lseek(int,int);
 
 #endif

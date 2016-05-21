@@ -4,14 +4,34 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+Node	game.c	/^}Node;$/;"	t	typeref:struct:Node_he	file:
+Node_he	game.c	/^typedef struct Node_he{$/;"	s	file:
+Node_he::color	game.c	/^	int locx,locy,color;$/;"	m	struct:Node_he	file:	access:public
+Node_he::locx	game.c	/^	int locx,locy,color;$/;"	m	struct:Node_he	file:	access:public
+Node_he::locy	game.c	/^	int locx,locy,color;$/;"	m	struct:Node_he	file:	access:public
+add_node	game.c	/^void add_node()$/;"	f
+add_node	game.c	/^void add_node();$/;"	p	file:
+color	game.c	/^	int locx,locy,color;$/;"	m	struct:Node_he	file:	access:public
+con	game.c	/^char con[10]="consumer";$/;"	v
+consumer	game.c	/^void consumer(int *st)$/;"	f	signature:(int *st)
 draw_screen	game.c	/^void draw_screen()$/;"	f
 draw_screen	game.c	/^void draw_screen();$/;"	p	file:
-init_idt	game.c	/^extern void init_idt();$/;"	p	file:
-init_intr	game.c	/^extern void init_intr();$/;"	p	file:
-init_serial	game.c	/^extern void init_serial();$/;"	p	file:
-key_event	game.c	/^void key_event(int code)$/;"	f	signature:(int code)
-loc	game.c	/^int loc,locx,tick=0;$/;"	v
-locx	game.c	/^int loc,locx,tick=0;$/;"	v
+empty	game.c	/^semaphore empty=5;$/;"	v
+end_loc	game.c	/^static int loc=100,seed=2, start_loc=0,end_loc=0;$/;"	v	file:
+full	game.c	/^semaphore full=0;$/;"	v
+loc	game.c	/^static int loc=100,seed=2, start_loc=0,end_loc=0;$/;"	v	file:
+locx	game.c	/^	int locx,locy,color;$/;"	m	struct:Node_he	file:	access:public
+locy	game.c	/^	int locx,locy,color;$/;"	m	struct:Node_he	file:	access:public
 main	game.c	/^int main(){$/;"	f
-tick	game.c	/^int loc,locx,tick=0;$/;"	v
-timer_event	game.c	/^void timer_event(){$/;"	f
+move_node	game.c	/^void move_node()$/;"	f
+move_node	game.c	/^void move_node();$/;"	p	file:
+mutex	game.c	/^semaphore mutex=1;$/;"	v
+pro	game.c	/^char pro[10]="producer";$/;"	v
+producer	game.c	/^void producer(int* st)$/;"	f	signature:(int* st)
+rand	game.c	/^static int rand()$/;"	f	file:
+screen	game.c	/^static uint8_t screen[SCR_SIZE];$/;"	v	file:
+seed	game.c	/^static int loc=100,seed=2, start_loc=0,end_loc=0;$/;"	v	file:
+start_loc	game.c	/^static int loc=100,seed=2, start_loc=0,end_loc=0;$/;"	v	file:
+t	game.c	/^static Node t[1000];$/;"	v	file:
+test_bomb	game.c	/^void test_bomb()$/;"	f
+thid	game.c	/^int thid[20];$/;"	v

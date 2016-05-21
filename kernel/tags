@@ -9,6 +9,10 @@ DPL_KERNEL	irq/do_irq.S	/^#define DPL_KERNEL 0$/;"	d
 FA_PID	pcb.c	/^	uint32_t FA_PID;$/;"	m	struct:PCB	file:	access:public
 FREQ_8253	device/timer.c	7;"	d	file:
 HZ	device/timer.c	8;"	d	file:
+IDE_BSY	disk/ide.c	10;"	d	file:
+IDE_DF	disk/ide.c	12;"	d	file:
+IDE_DRDY	disk/ide.c	11;"	d	file:
+IDE_ERR	disk/ide.c	13;"	d	file:
 INTERRUPT_GATE_32	irq/idt.c	3;"	d	file:
 IO_PIC1	irq/i8259.c	3;"	d	file:
 IO_PIC2	irq/i8259.c	4;"	d	file:
@@ -20,6 +24,7 @@ PARTIAL_UPDATE	device/video.c	13;"	d	file:
 PCB	pcb.c	/^struct PCB$/;"	s	file:
 PCB::FA_PID	pcb.c	/^	uint32_t FA_PID;$/;"	m	struct:PCB	file:	access:public
 PCB::PID	pcb.c	/^	uint32_t PID;$/;"	m	struct:PCB	file:	access:public
+PCB::blocksem	pcb.c	/^	uint32_t blocksem;$/;"	m	struct:PCB	file:	access:public
 PCB::kstack	pcb.c	/^	uint8_t kstack[4096];$/;"	m	struct:PCB	file:	access:public
 PCB::link	pcb.c	/^	struct PCB *link;$/;"	m	struct:PCB	typeref:struct:PCB::PCB	file:	access:public
 PCB::pgdir	pcb.c	/^	pde_t *pgdir;$/;"	m	struct:PCB	file:	access:public
@@ -31,7 +36,7 @@ PID	pcb.c	/^	uint32_t PID;$/;"	m	struct:PCB	file:	access:public
 PID_cnt	pcb.c	/^static uint32_t PID_cnt;$/;"	v	file:
 PORT	printk.c	11;"	d	file:
 RELOC	entry.S	/^#define	RELOC(x) ((x) - KERNBASE)$/;"	d
-SECTSIZE	loader.c	8;"	d	file:
+SECTSIZE	loader.c	9;"	d	file:
 SEG_KERNEL_CODE	irq/do_irq.S	/^#define SEG_KERNEL_CODE 1$/;"	d
 SEG_KERNEL_DATA	irq/do_irq.S	/^#define SEG_KERNEL_DATA 2$/;"	d
 SELECTOR_KERNEL	irq/do_irq.S	/^#define SELECTOR_KERNEL(s)	( ((s) << 3) | DPL_KERNEL )$/;"	d
@@ -44,12 +49,15 @@ _start	entry.S	/^_start = RELOC(entry)$/;"	d
 _warn	assert.c	/^_warn(const char *file, int line, const char *fmt,...)$/;"	f	signature:(const char *file, int line, const char *fmt,...)
 alloc_pcb	pcb.c	/^struct PCB * alloc_pcb(pde_t *pgdir)$/;"	f	signature:(pde_t *pgdir)
 asm_do_irq	irq/do_irq.S	/^asm_do_irq:$/;"	l
+blocksem	pcb.c	/^	uint32_t blocksem;$/;"	m	struct:PCB	file:	access:public
 blue_screen	device/video.c	/^blue_screen(){$/;"	f
 boot_map_region	pmap.c	/^boot_map_region(pde_t *pgdir, uintptr_t va, unsigned long size, physaddr_t pa, int perm)$/;"	f	signature:(pde_t *pgdir, uintptr_t va, unsigned long size, physaddr_t pa, int perm)
 bootstack	entry.S	/^bootstack:$/;"	l
 bootstacktop	entry.S	/^bootstacktop:$/;"	l
 change_tss	kvm.c	/^void change_tss(unsigned int loc)$/;"	f	signature:(unsigned int loc)
 cnt	device/timer.c	/^static int cnt=0;$/;"	v	file:
+diskmap	disk/filesystem.c	/^static struct bitmap diskmap;$/;"	v	typeref:struct:bitmap	file:
+diskno	disk/ide.c	/^static int diskno = 0;$/;"	v	file:
 display_buffer	device/video.c	/^display_buffer(void) {$/;"	f	signature:(void)
 do_keyboard	irq/irq_handle.c	/^static void (*do_keyboard)(int);$/;"	v	file:
 do_syscall	irq/irq_handle.c	/^void do_syscall(struct TrapFrame *tf);$/;"	p	file:	signature:(struct TrapFrame *tf)
@@ -60,8 +68,15 @@ entry	entry.S	/^entry:$/;"	l
 entry_pgdir	entrypgdir.c	/^pde_t entry_pgdir[NPDENTRIES] = {$/;"	v
 entry_pgtable	entrypgdir.c	/^pte_t entry_pgtable[NPTENTRIES] = {$/;"	v
 entry_pgtable	entrypgdir.c	/^pte_t entry_pgtable[NPTENTRIES];$/;"	v
+fileinit	disk/filesystem.c	/^void fileinit()$/;"	f
+fileread	disk/filesystem.c	/^void fileread(unsigned char *loc,int cnt,int offset)$/;"	f	signature:(unsigned char *loc,int cnt,int offset)
 gameloader	loader.c	/^void gameloader(void)$/;"	f	signature:(void)
 gdt	kvm.c	/^static struct Segdesc gdt[NR_SEGMENTS];$/;"	v	typeref:struct:Segdesc	file:
+ide_probe_disk1	disk/ide.c	/^ide_probe_disk1(void)$/;"	f	signature:(void)
+ide_read	disk/ide.c	/^ide_read(uint32_t secno, void *dst, size_t nsecs)$/;"	f	signature:(uint32_t secno, void *dst, size_t nsecs)
+ide_set_disk	disk/ide.c	/^ide_set_disk(int d)$/;"	f	signature:(int d)
+ide_wait_ready	disk/ide.c	/^ide_wait_ready(bool check_error)$/;"	f	file:	signature:(bool check_error)
+ide_write	disk/ide.c	/^ide_write(uint32_t secno, const void *src, size_t nsecs)$/;"	f	signature:(uint32_t secno, const void *src, size_t nsecs)
 idt	irq/idt.c	/^struct GateDescriptor idt[NR_IRQ];$/;"	v	typeref:struct:GateDescriptor
 init_idt	irq/idt.c	/^void init_idt() {$/;"	f
 init_idt	main.c	/^extern void init_idt();$/;"	p	file:
@@ -72,6 +87,8 @@ init_segment	kvm.c	/^init_segment(void) {$/;"	f	signature:(void)
 init_serial	device/serial.c	/^init_serial(void) {$/;"	f	signature:(void)
 init_serial	main.c	/^extern void init_serial();$/;"	p	file:
 init_timer	device/timer.c	/^init_timer(void) {$/;"	f	signature:(void)
+initblock	disk/filesystem.c	/^uint32_t initblock[512\/4];$/;"	v
+initfileread	disk/filesystem.c	/^void initfileread(unsigned char *loc,int cnt,int offset)$/;"	f	signature:(unsigned char *loc,int cnt,int offset)
 intogame	loader.c	/^void intogame(pde_t* pgdir,uint32_t entry){$/;"	f	signature:(pde_t* pgdir,uint32_t entry)
 intogame	loader.c	/^void intogame(pde_t*,uint32_t);$/;"	p	file:	signature:(pde_t*,uint32_t)
 irq0	irq/idt.c	/^void irq0();$/;"	p	file:
@@ -95,7 +112,7 @@ page_lookup	pmap.c	/^page_lookup(pde_t *pgdir, void *va, pte_t **pte_store)$/;"	
 page_remove	pmap.c	/^page_remove(pde_t *pgdir, void *va)$/;"	f	signature:(pde_t *pgdir, void *va)
 pages	pmap.c	/^struct PageInfo pages[npages];		\/\/ Physical page state array$/;"	v	typeref:struct:PageInfo
 panicstr	assert.c	/^const char *panicstr;$/;"	v
-pcb_exit	pcb.c	/^void pcb_exit()$/;"	f
+pcb_exit	pcb.c	/^void pcb_exit(int way)$/;"	f	signature:(int way)
 pcb_free_list	pcb.c	/^static struct PCB *pcb_free_list;$/;"	v	typeref:struct:PCB	file:
 pcb_pblock_list	pcb.c	/^static struct PCB *pcb_pblock_list;$/;"	v	typeref:struct:PCB	file:
 pcb_running_list	pcb.c	/^static struct PCB *pcb_running_list;$/;"	v	typeref:struct:PCB	file:
@@ -116,6 +133,7 @@ readseg	loader.c	/^readseg(unsigned char *pa, int count, int offset) {$/;"	f	sig
 readseg	loader.c	/^void readseg(unsigned char *, int, int);$/;"	p	file:	signature:(unsigned char *, int, int)
 relocated	entry.S	/^relocated:$/;"	l
 right_move	device/keyborad.c	/^static int right_move=0;$/;"	v	file:
+root	disk/filesystem.c	/^static struct dir root;$/;"	v	typeref:struct:dir	file:
 runprocess	pcb.c	/^void runprocess()$/;"	f
 save_idt	irq/idt.c	/^void save_idt();$/;"	p	file:
 save_idt	irq/idt.c	/^void save_idt(void *addr, uint32_t size) {$/;"	f	signature:(void *addr, uint32_t size)
@@ -134,12 +152,15 @@ state	pcb.c	/^	uint8_t state;$/;"	m	struct:PCB	file:	access:public
 sys_display	device/video.c	/^void sys_display(uint32_t* vouter)$/;"	f	signature:(uint32_t* vouter)
 sys_fork	pcb.c	/^void sys_fork(struct TrapFrame *tf)$/;"	f	signature:(struct TrapFrame *tf)
 sys_key_query	device/keyborad.c	/^int sys_key_query()$/;"	f
+sys_sem_down	pcb.c	/^void sys_sem_down(void *semloc)$/;"	f	signature:(void *semloc)
+sys_sem_up	pcb.c	/^void sys_sem_up(void *semloc)$/;"	f	signature:(void *semloc)
 sys_thread_create	pcb.c	/^void sys_thread_create(struct TrapFrame *tf,void* functionloc,void *arg)$/;"	f	signature:(struct TrapFrame *tf,void* functionloc,void *arg)
 sys_timer_query	device/timer.c	/^int sys_timer_query()$/;"	f
 tf	pcb.c	/^	struct TrapFrame *tf;$/;"	m	struct:PCB	typeref:struct:PCB::TrapFrame	file:	access:public
 time_slice	pcb.c	/^	uint32_t time_slice;$/;"	m	struct:PCB	file:	access:public
 timer_event	device/timer.c	/^void timer_event(){$/;"	f
 tlb_invalidate	pmap.c	/^tlb_invalidate(pde_t *pgdir, void *va)$/;"	f	signature:(pde_t *pgdir, void *va)
+tmpblock	disk/filesystem.c	/^static struct block tmpblock;$/;"	v	typeref:struct:block	file:
 tss	kvm.c	/^static TSS tss; $/;"	v	file:
 updaterunninglist	pcb.c	/^void updaterunninglist()$/;"	f
 vbuf	device/video.c	/^static uint8_t vbuf[SCR_SIZE];$/;"	v	file:

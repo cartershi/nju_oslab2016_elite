@@ -5,6 +5,7 @@
 #include "include/keyboard.h"
 #include "include/timer.h"
 #include "include/pcb.h"
+#include "include/fcb.h"
 
 static void (*do_timer)(void);
 static void (*do_keyboard)(int);
@@ -95,6 +96,18 @@ void do_syscall(struct TrapFrame *tf){
 			//printk("up\n");
 			sys_sem_up((void *)tf->ecx);
 			runprocess();
+			break;
+		case 11:
+			tf->eax=sys_file_open((char *)tf->ecx);
+			break;
+		case 12:
+			sys_file_read((unsigned char*)tf->ecx,tf->ebx,tf->edx);
+			break;
+		case 13:
+			sys_file_close(tf->ecx);
+			break;
+		case 14:
+			sys_file_seek(tf->ecx,tf->edx);
 			break;
 		break;
 		default: break;

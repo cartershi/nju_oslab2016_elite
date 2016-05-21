@@ -113,3 +113,49 @@ void sem_post(void *semloc)
 			:"r"(semloc)
 			:"%eax","%ecx");
 }
+
+int open(char * src)
+{
+	int fp;
+	__asm__("movl $0xB, %%eax\n\t"
+			"movl %1, %%ecx\n\t"
+			"int $0x80\n\t"
+			"movl %%eax, %0"
+			:"=g"(fp)
+			:"r"(src)
+			:"%eax","%ecx");
+	return fp;
+}
+
+void read(void *dest,int cnt,int fp)
+{
+	__asm__("movl $0xC, %%eax\n\t"
+			"movl %0, %%ecx\n\t"
+			"movl %1, %%edx\n\t"
+			"movl %2, %%ebx\n\t"
+			"int $0x80"
+			:
+			:"m"(dest),"m"(cnt),"m"(fp)
+			:"%eax","%ecx","%edx","%ebx");
+}
+
+void close(int fp)
+{
+	__asm__("movl $0xD, %%eax\n\t"
+			"movl %0, %%ecx\n\t"
+			"int $0x80"
+			:
+			:"r"(fp)
+			:"%eax","%ecx");
+}
+
+void lseek(int fp,int move)
+{
+	__asm__("movl $0xE, %%eax\n\t"
+			"movl %0, %%ecx\n\t"
+			"movl %1, %%edx\n\t"
+			"int $0x80"
+			:
+			:"r"(fp),"r"(move)
+			:"%eax","ecx");
+}

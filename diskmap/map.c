@@ -36,7 +36,7 @@ int main(int argc,char* argv[])
 		blockcnt=0;
 		//printf("%s\n",file->filename);
 		file->inode_offset=maploc();
-		//diskdata[file->inode_offset]=(struct block*)malloc(512);
+		//printf("inode %d\n",file->inode_offset);
 		for (i=0; i<512/4; i++) 
 			infoblock.data_block_offsets[i]=0;
 		file->file_size=0;
@@ -45,20 +45,15 @@ int main(int argc,char* argv[])
 		while (readnum!=0)
 		{
 			serial=maploc();
-			//diskdata[serial]=(struct block*)malloc(512);
 			infoblock.data_block_offsets[blockcnt]=serial; //info block update
 			blockcnt++;
-			//for (i=0; i<readnum; i++) 
-			//	diskdata[serial]->data[i]=datablock.data[i];//data block copy
 			file->file_size+=readnum;
 			fseek(fp,baseoffset+serial*512,SEEK_SET);
 			fwrite(datablock.data,1,512,fp);
 			for (i=0; i<512; i++) datablock.data[i]=0;
 			readnum=fread(datablock.data,1,512,pFile); //next block
 		}
-		//memcpy(diskdata[file->inode_offset]->data,
-		//		infoblock.data_block_offsets,512);	//info block copy
-		fseek(fp,baseoffset+file->inode_offset*8,SEEK_SET);
+		fseek(fp,baseoffset+file->inode_offset*512,SEEK_SET);
 		fwrite(infoblock.data_block_offsets,1,512,fp);
 		//for (i=0; i<512/4; i++) printf("%u",
 		//		diskdata[file->inode_offset]->data[i*4]);
